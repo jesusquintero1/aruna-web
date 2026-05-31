@@ -6,6 +6,12 @@ import { siteConfig } from "@/config/site";
 import { formatPrice, getProductSchema } from "@/lib/utils";
 import ProductDetailsClient from "@/components/ProductDetailsClient";
 
+export async function generateStaticParams() {
+  return productos.map((producto) => ({
+    id: producto.id,
+  }));
+}
+
 interface PageProps {
   params: Promise<{ id: string }>;
 }

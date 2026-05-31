@@ -2,6 +2,8 @@ import { MetadataRoute } from "next";
 import { productos } from "@/data/productos";
 import { siteConfig } from "@/config/site";
 
+export const dynamic = "force-static";
+
 /**
  * Generador Dinámico de Sitemap para Next.js App Router.
  * Se compila automáticamente y se sirve en `/sitemap.xml`.
