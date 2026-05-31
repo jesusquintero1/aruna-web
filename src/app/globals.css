@@ -7,10 +7,14 @@
   --color-caribe-light: #e6f3f4;
   --color-cardenal: #c1272d; /* Rojo Cardenal Guajiro - Acento Intenso */
   --color-cactus: #526b43; /* Verde Cardón - Paisaje Guajiro */
+  --color-cardon: #526b43; /* Verde Cardón */
   --color-cream: #faf7f2; /* Arena de Taroa y Hilo de Algodón Crudo - Fondo */
   --color-cream-dark: #e3dbd0;
   --color-chocolate: #35251e; /* Carbón y Tierra - Texto Contraste */
   --color-chocolate-light: #5a4b45;
+  --color-carbon: #35251e; /* Carbón oscuro para fondos contrastados y texto nítido */
+  --color-arena: #faf7f2; /* Arena clara de Taroa - color claro de fondo */
+  --color-arena-oscura: #e3dbd0; /* Arena tostada para bordes y separadores */
   --color-gold: #c96541; /* Mapeado a Terracotta */
   --color-obsidian: #faf7f2; /* Mapeado a Cream */
   --color-surface: #f7f2e8; /* Paneles beige fibra natural */
@@ -20,8 +24,6 @@
   --color-flamingo: #ec6f8e;
   --color-flamenco: #ec6f8e;
   --color-flamenco-claro: #f59db1;
-  --color-arena: #35251e;
-  --color-arena-oscura: #5a4b45;
   --color-purple: #c96541;
   
   --font-title: var(--font-syne), var(--font-sans), sans-serif;
