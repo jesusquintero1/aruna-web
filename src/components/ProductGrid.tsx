@@ -49,7 +49,7 @@ export default function ProductGrid({ onlyFeatured = false }: ProductGridProps) 
               className={`flex flex-col items-center justify-center p-4 rounded-3xl border-2 transition-all duration-300 w-24 h-24 active:scale-95 ${
                 activeSymbol === null
                   ? "bg-gold border-gold text-obsidian shadow-lg shadow-gold/15"
-                  : "bg-surface/50 border-white/5 text-sand-muted hover:border-gold/30 hover:text-sand"
+                  : "bg-surface/50 border-cream-dark/60 text-sand-muted hover:border-gold/30 hover:text-sand"
               }`}
             >
               <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center mb-2">
@@ -70,7 +70,7 @@ export default function ProductGrid({ onlyFeatured = false }: ProductGridProps) 
                   className={`flex flex-col items-center justify-center p-4 rounded-3xl border-2 transition-all duration-300 w-24 h-24 active:scale-95 ${
                     isActive
                       ? "bg-gold border-gold text-obsidian shadow-lg shadow-gold/15"
-                      : "bg-surface/50 border-white/5 text-sand-muted hover:border-gold/30 hover:text-sand"
+                      : "bg-surface/50 border-cream-dark/60 text-sand-muted hover:border-gold/30 hover:text-sand"
                   }`}
                   title={`Filtrar por ${symbol.name}`}
                 >

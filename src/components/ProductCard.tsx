@@ -27,7 +27,7 @@ export default function ProductCard({ producto }: ProductCardProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.5 }}
-      className="group relative flex flex-col bg-surface/40 border border-white/5 rounded-3xl overflow-hidden hover:border-gold/30 hover:shadow-2xl hover:shadow-gold/[0.02] hover:bg-surface transition-all duration-500 h-full"
+      className="group relative flex flex-col bg-surface/40 border border-cream-dark/60 rounded-3xl overflow-hidden hover:border-gold/30 hover:shadow-2xl hover:shadow-terracotta/[0.03] hover:bg-surface transition-all duration-500 h-full"
     >
       {/* Contenedor de la Imagen */}
       <div className="relative w-full aspect-[4/5] bg-obsidian/45 overflow-hidden">

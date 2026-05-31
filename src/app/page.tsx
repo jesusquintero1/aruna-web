@@ -96,7 +96,7 @@ export default function HomePage() {
           >
             {/* Imagen del Slide */}
             <div 
-              className="absolute inset-0 bg-cover bg-center select-none pointer-events-none"
+              className="absolute inset-0 bg-cover bg-center select-none pointer-events-none animate-zoomBg"
               style={{ backgroundImage: `url('${slides[currentSlide].bgImage}')` }}
             />
             {/* Máscara de color degradado natural */}
