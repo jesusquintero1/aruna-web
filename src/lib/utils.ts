@@ -46,7 +46,7 @@ export function getCartWhatsappLink(items: { product: Producto; quantity: number
   let orderDetails = "";
   let total = 0;
   
-  items.forEach((item, index) => {
+  items.forEach((item) => {
     const itemTotal = item.product.precio * item.quantity;
     orderDetails += `- ${item.quantity}x *${item.product.nombre}* (${formatPrice(item.product.precio)} c/u) = ${formatPrice(itemTotal)}\n`;
     total += itemTotal;

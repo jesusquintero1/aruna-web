@@ -3,7 +3,6 @@
 import React from "react";
 import Link from "next/link";
 import { siteConfig } from "@/config/site";
-import { formatPrice } from "@/lib/utils";
 import { MapPin, Mail, Phone, Heart } from "lucide-react";
 
 // Icono de Instagram personalizado para máxima robustez en compresión ESM

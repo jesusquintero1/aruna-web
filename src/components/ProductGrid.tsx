@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { productos, Producto } from "@/data/productos";
+import { productos } from "@/data/productos";
 import { simbolosData } from "@/data/simbolos";
 import ProductCard from "./ProductCard";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Eye } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 interface ProductGridProps {
   onlyFeatured?: boolean;
@@ -106,7 +106,7 @@ export default function ProductGrid({ onlyFeatured = false }: ProductGridProps) 
                     <h3 className="font-title font-bold text-lg text-sand leading-none flex items-baseline gap-2">
                       Inspiración {selectedSymbolDetail.name}
                       <span className="text-xs text-sand-muted font-semibold italic uppercase tracking-wider">
-                        "{selectedSymbolDetail.wayuu}"
+                        &quot;{selectedSymbolDetail.wayuu}&quot;
                       </span>
                     </h3>
                     <p className="text-xs text-sand-muted leading-relaxed font-sans font-medium pt-1">

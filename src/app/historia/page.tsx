@@ -1,6 +1,6 @@
 import React from "react";
 import type { Metadata } from "next";
-import { siteConfig } from "@/config/site";
+import Image from "next/image";
 import {
   ColibriIcon,
   FlamencoIcon,
@@ -61,12 +61,12 @@ export default function HistoriaPage() {
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         <div className="lg:col-span-7 space-y-6">
           <span className="text-xs uppercase font-bold tracking-widest text-cardenal">La Leyenda</span>
-          <h2 className="font-display font-black text-3xl text-carbon">El Mito de Wale' Kerü</h2>
+          <h2 className="font-display font-black text-3xl text-carbon">El Mito de Wale&apos; Kerü</h2>
           <p className="text-sm sm:text-base text-carbon/80 leading-relaxed font-medium">
-            Cuenta la leyenda tradicional que el arte de tejer fue revelado a las mujeres Wayuu por <strong>Wale' Kerü</strong>, una araña tejedora mitológica. Wale' Kerü siempre tejía bajo la luz de la luna, creando fajas y mochilas hermosas con patrones nunca antes vistos. 
+            Cuenta la leyenda tradicional que el arte de tejer fue revelado a las mujeres Wayuu por <strong>Wale&apos; Kerü</strong>, una araña tejedora mitológica. Wale&apos; Kerü siempre tejía bajo la luz de la luna, creando fajas y mochilas hermosas con patrones nunca antes vistos. 
           </p>
           <p className="text-sm sm:text-base text-carbon/80 leading-relaxed font-medium">
-            Una joven de la ranchería, fascinada por los diseños, le pidió a la araña que le enseñara sus secretos. Wale' Kerü aceptó enseñarle, pero con una condición: el tejido debía hacerse con absoluto respeto, paciencia y silencio, pues cada puntada expresaba un pensamiento del alma. Desde entonces, el tejido se convirtió en un rito de paso y en el mayor orgullo de las mujeres de nuestra comunidad.
+            Una joven de la ranchería, fascinada por los diseños, le pidió a la araña que le enseñara sus secretos. Wale&apos; Kerü aceptó enseñarle, pero con una condición: el tejido debía hacerse con absoluto respeto, paciencia y silencio, pues cada puntada expresaba un pensamiento del alma. Desde entonces, el tejido se convirtió en un rito de paso y en el mayor orgullo de las mujeres de nuestra comunidad.
           </p>
         </div>
         
@@ -75,9 +75,9 @@ export default function HistoriaPage() {
           <div className="relative w-full max-w-[340px] bg-arena-oscura/15 border border-arena-oscura/35 p-8 rounded-3xl text-center overflow-hidden">
             <div className="absolute inset-0 bg-kana opacity-10" />
             <ColibriIcon size={80} className="text-flamenco mx-auto mb-4 animate-colibri relative z-10" />
-            <h3 className="font-display font-bold text-lg text-carbon relative z-10">Wale' Kerü</h3>
+            <h3 className="font-display font-bold text-lg text-carbon relative z-10">Wale&apos; Kerü</h3>
             <p className="text-xs text-carbon/60 pt-2 relative z-10">
-              "El hilo de la vida se teje con la paciencia de la araña y la mística de la luna guajira."
+              &quot;El hilo de la vida se teje con la paciencia de la araña y la mística de la luna guajira.&quot;
             </p>
           </div>
         </div>
@@ -165,9 +165,11 @@ export default function HistoriaPage() {
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         <div className="lg:col-span-5 flex items-center justify-center order-last lg:order-first">
           <div className="relative aspect-square w-full max-w-[320px] rounded-3xl overflow-hidden bg-arena-oscura/20 border border-arena-oscura/35 shadow-md">
-            <img
+            <Image
               src="https://images.unsplash.com/photo-1528822838844-10b70d41880b?auto=format&fit=crop&q=80&w=800"
               alt="Hilos coloridos en manos"
+              width={320}
+              height={320}
               className="object-cover w-full h-full"
             />
           </div>

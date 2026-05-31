@@ -3,13 +3,10 @@
 import React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles, ShieldCheck, HeartHandshake, Compass, Clock, MapPin, Droplets } from "lucide-react";
+import { ArrowRight, Sparkles, Clock, MapPin, Droplets } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import ProductGrid from "@/components/ProductGrid";
 import {
-  ColibriIcon,
-  FlamencoIcon,
-  CardenalIcon,
   WayuuDivider
 } from "@/components/FaunaFloraIcons";
 import { getGeneralWhatsappLink } from "@/lib/utils";
@@ -246,7 +243,7 @@ export default function HomePage() {
                 <p className="text-[10px] text-sand-muted font-semibold uppercase tracking-widest">Comunidad de Wüinpumüin, Uribia</p>
               </div>
               <blockquote className="text-xs leading-relaxed text-sand-muted italic font-medium pt-2 border-t border-white/5">
-                "Tejer es conversar con nuestros ancestros. Cada mochila lleva un pedazo de mi alma y la brisa del desierto."
+                &quot;Tejer es conversar con nuestros ancestros. Cada mochila lleva un pedazo de mi alma y la brisa del desierto.&quot;
               </blockquote>
               <div className="bg-white/5 p-4 rounded-2xl border border-white/5 space-y-2">
                 <div className="flex justify-between items-center text-[10px] text-sand-muted uppercase font-bold tracking-widest">
@@ -258,7 +255,7 @@ export default function HomePage() {
                   <div className="w-[20%] bg-gold h-full"></div>
                   <div className="w-[20%] bg-caribe h-full"></div>
                 </div>
-                <span className="text-[9px] text-sand-muted/60 block text-right font-medium">Patrón "Jalala'irü" en curso</span>
+                <span className="text-[9px] text-sand-muted/60 block text-right font-medium">Patrón &quot;Jalala&apos;irü&quot; en curso</span>
               </div>
             </div>
           </div>

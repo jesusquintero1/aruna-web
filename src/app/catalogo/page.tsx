@@ -1,6 +1,5 @@
 import React from "react";
 import type { Metadata } from "next";
-import { siteConfig } from "@/config/site";
 import ProductGrid from "@/components/ProductGrid";
 import { WayuuDivider, LirioIcon, DelfinIcon } from "@/components/FaunaFloraIcons";
 

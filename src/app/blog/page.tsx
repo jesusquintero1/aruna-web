@@ -1,6 +1,6 @@
 import React from "react";
 import type { Metadata } from "next";
-import Link from "next/link";
+import Image from "next/image";
 import { WayuuDivider, ColibriIcon } from "@/components/FaunaFloraIcons";
 import { ArrowRight, BookOpen, Clock } from "lucide-react";
 import NewsletterForm from "@/components/NewsletterForm";
@@ -80,9 +80,11 @@ export default function BlogHubPage() {
           >
             {/* Imagen de Portada */}
             <div className="relative aspect-video w-full bg-arena-oscura/20 overflow-hidden">
-              <img
+              <Image
                 src={post.image}
                 alt={post.title}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700 ease-out"
               />
               <div className="absolute top-4 left-4 z-10">

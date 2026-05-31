@@ -31,7 +31,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     const savedCart = localStorage.getItem("aruna_cart");
     if (savedCart) {
       try {
-        setCart(JSON.parse(savedCart));
+        const parsed = JSON.parse(savedCart);
+        if (parsed) {
+          Promise.resolve().then(() => {
+            setCart(parsed);
+          });
+        }
       } catch (e) {
         console.error("Error al parsear el carrito guardado:", e);
       }

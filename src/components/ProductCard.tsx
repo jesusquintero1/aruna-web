@@ -66,7 +66,7 @@ export default function ProductCard({ producto }: ProductCardProps) {
               <h4 className="font-title font-bold text-xs text-sand flex items-baseline gap-1.5 leading-none">
                 {symbolDetail.name}
                 <span className="text-[8px] text-sand-muted font-normal lowercase italic">
-                  "{symbolDetail.wayuu}"
+                  &quot;{symbolDetail.wayuu}&quot;
                 </span>
               </h4>
               <p className="text-[10px] text-sand-muted leading-relaxed font-sans font-medium">
