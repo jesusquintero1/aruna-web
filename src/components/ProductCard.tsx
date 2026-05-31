@@ -105,10 +105,15 @@ export default function ProductCard({ producto }: ProductCardProps) {
       {/* Contenido / Textos */}
       <div className="flex-grow p-6 flex flex-col justify-between">
         <div className="space-y-2">
-          {/* Colores */}
-          <span className="text-[10px] text-sand-muted uppercase tracking-widest font-bold block">
-            {producto.colores.slice(0, 2).join(" · ")}
-          </span>
+          {/* Colores & Estrellas */}
+          <div className="flex items-center justify-between">
+            <span className="text-[9px] text-sand-muted uppercase tracking-widest font-bold block">
+              {producto.colores.slice(0, 2).join(" · ")}
+            </span>
+            <div className="flex gap-0.5 text-terracotta text-[9px] leading-none">
+              <span>✦</span><span>✦</span><span>✦</span><span>✦</span><span>✦</span>
+            </div>
+          </div>
 
           {/* Nombre del Producto */}
           <h3 className="font-title font-bold text-lg text-sand group-hover:text-gold transition-colors leading-snug">

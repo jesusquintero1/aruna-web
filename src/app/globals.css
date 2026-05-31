@@ -1,25 +1,36 @@
 @import "tailwindcss";
 
 @theme {
-  --color-terracotta: #b85a38;
-  --color-gold: #e5a93b;
-  --color-flamingo: #e77b88;
-  --color-caribe: #1f8a94;
-  --color-cactus: #3d643e;
-  --color-purple: #8e44ad;
-  --color-obsidian: #120e0b;
-  --color-surface: #1e1814;
-  --color-surface-card: #28201b;
-  --color-sand: #f5ebe1;
-  --color-sand-muted: #c2b5a8;
+  --color-terracotta: #c96541; /* Arcilla de La Guajira - Tono Primario */
+  --color-terracotta-light: #f5ebe6;
+  --color-caribe: #1f8a94; /* Mar Caribe de Cabo de la Vela - Tono Secundario */
+  --color-caribe-light: #e6f3f4;
+  --color-cardenal: #c1272d; /* Rojo Cardenal Guajiro - Acento Intenso */
+  --color-cactus: #526b43; /* Verde Cardón - Paisaje Guajiro */
+  --color-cream: #faf7f2; /* Arena de Taroa y Hilo de Algodón Crudo - Fondo */
+  --color-cream-dark: #e3dbd0;
+  --color-chocolate: #35251e; /* Carbón y Tierra - Texto Contraste */
+  --color-chocolate-light: #5a4b45;
+  --color-gold: #c96541; /* Mapeado a Terracotta */
+  --color-obsidian: #faf7f2; /* Mapeado a Cream */
+  --color-surface: #f7f2e8; /* Paneles beige fibra natural */
+  --color-surface-card: #eee6da;
+  --color-sand: #35251e; /* Mapeado a Chocolate */
+  --color-sand-muted: #5a4b45;
+  --color-flamingo: #ec6f8e;
+  --color-flamenco: #ec6f8e;
+  --color-flamenco-claro: #f59db1;
+  --color-arena: #35251e;
+  --color-arena-oscura: #5a4b45;
+  --color-purple: #c96541;
   
   --font-title: var(--font-syne), var(--font-sans), sans-serif;
   --font-sans: var(--font-plus-jakarta-sans), sans-serif;
 }
 
 :root {
-  --background: #120e0b;
-  --foreground: #f5ebe1;
+  --background: #faf7f2;
+  --foreground: #35251e;
 }
 
 body {
@@ -43,11 +54,11 @@ body {
 }
 
 .bg-sunset-glow {
-  background: #b85a38;
+  background: #c96541; /* Resplandor de Atardecer Guajiro (Arcilla/Terracotta) */
 }
 
 .bg-ocean-glow {
-  background: #1f8a94;
+  background: #1f8a94; /* Resplandor del Mar Caribe (Cabo de la Vela) */
 }
 
 @keyframes floatGlow {
@@ -55,18 +66,18 @@ body {
   100% { transform: translate(5%, 8%) scale(1.15); }
 }
 
-/* Glassmorphism premium dark */
+/* Glassmorphism premium light (Misolé-inspired, fiber-textured) */
 .glass-panel {
-  background: rgba(30, 24, 20, 0.7);
+  background: rgba(247, 242, 232, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(194, 181, 168, 0.1);
+  border: 1px solid rgba(53, 37, 30, 0.08);
 }
 
 .glass-panel-light {
-  background: rgba(245, 235, 225, 0.05);
+  background: rgba(250, 247, 242, 0.5);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(53, 37, 30, 0.04);
 }
 
 /* Ocultar barra de scroll pero mantener funcionalidad */
@@ -91,29 +102,29 @@ body {
 /* Pulso del Logo */
 @keyframes pulseLogo {
   0% { transform: scale(1); opacity: 0.7; }
-  100% { transform: scale(1.2) rotate(15deg); opacity: 1; filter: drop-shadow(0 0 5px #e5a93b); }
+  100% { transform: scale(1.2) rotate(15deg); opacity: 1; filter: drop-shadow(0 0 5px #c96541); }
 }
 
 .animate-pulseLogo {
   animation: pulseLogo 3s infinite alternate ease-in-out;
 }
 
-/* Borde geométrico Wayuu (Cenefa) */
+/* Borde geométrico Wayuu (Cenefa Terracotta) */
 .bg-kana-border {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='20' viewBox='0 0 40 20'%3E%3Cpath d='M0 0 L10 10 L20 0 L30 10 L40 0 M0 20 L10 10 L20 20 L30 10 L40 20' fill='none' stroke='%23e5a93b' stroke-width='2'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='20' viewBox='0 0 40 20'%3E%3Cpath d='M0 0 L10 10 L20 0 L30 10 L40 0 M0 20 L10 10 L20 20 L30 10 L40 20' fill='none' stroke='%23c96541' stroke-width='2'/%3E%3C/svg%3E");
   background-repeat: repeat-x;
   height: 20px;
 }
 
-/* Patrón de tejido general sutil */
+/* Patrón de tejido general sutil (Textura de Hilo) */
 .bg-kana {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M0 30 L30 0 L60 30 L30 60 Z M30 30 L30 30' fill='none' stroke='%23c2b5a8' stroke-width='1.5' stroke-opacity='0.12'/%3E%3Cpath d='M0 0 L15 15 L30 0 L45 15 L60 0' fill='none' stroke='%23c2b5a8' stroke-width='1' stroke-opacity='0.08'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M0 30 L30 0 L60 30 L30 60 Z M30 30 L30 30' fill='none' stroke='%2335251e' stroke-width='1.5' stroke-opacity='0.08'/%3E%3Cpath d='M0 0 L15 15 L30 0 L45 15 L60 0' fill='none' stroke='%2335251e' stroke-width='1' stroke-opacity='0.04'/%3E%3C/svg%3E");
   background-repeat: repeat;
 }
 
 /* Foco visible */
 .focus-ring:focus-visible {
-  outline: 2px solid #e5a93b;
+  outline: 2px solid #c96541;
   outline-offset: 4px;
 }
 
