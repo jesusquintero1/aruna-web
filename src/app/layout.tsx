@@ -72,8 +72,7 @@ export default function RootLayout({
           {/* Contenido Principal */}
           <main className="flex-grow pt-28 sm:pt-32">{children}</main>
           
-          {/* Botón flotante de WhatsApp y CartDrawer */}
-          <WhatsAppButton />
+          {/* CartDrawer */}
           <CartDrawer />
           
           {/* Pie de Página */}

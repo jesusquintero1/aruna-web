@@ -242,37 +242,20 @@ export default function ProductDetailsClient({ producto, productosRelacionados }
           {/* Botones de Acción de Compra */}
           <div className="space-y-3 pt-2">
             {producto.disponible ? (
-              <>
-                {/* Botón WhatsApp */}
-                <a
-                  href={whatsappLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full flex items-center justify-center space-x-2 bg-[#25D366] text-white py-4 rounded-full font-bold hover:bg-[#20ba5a] active:scale-95 transition-all duration-300 shadow-md uppercase text-xs tracking-wider"
-                >
-                  <MessageCircle className="w-4.5 h-4.5 fill-current" />
-                  <span>Pedir directo por WhatsApp</span>
-                </a>
-
-                {/* Botón Carrito */}
-                <button
-                  onClick={() => addToCart(producto)}
-                  className="w-full flex items-center justify-center space-x-2 border-2 border-chocolate text-chocolate hover:bg-chocolate hover:text-white py-4 rounded-full font-bold active:scale-95 transition-all duration-300 uppercase text-xs tracking-wider shadow-inner"
-                >
-                  <ShoppingCart className="w-4.5 h-4.5" />
-                  <span>Añadir al Carrito de Compras</span>
-                </button>
-              </>
-            ) : (
-              <a
-                href={getProductWhatsappLink({ ...producto, precio: 0 })}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full flex items-center justify-center space-x-2 border-2 border-cream-dark text-chocolate-light py-4 rounded-full font-bold hover:border-terracotta hover:text-terracotta transition-all duration-300 text-xs uppercase tracking-wider"
+              <button
+                onClick={() => addToCart(producto)}
+                className="w-full flex items-center justify-center space-x-2 bg-chocolate hover:bg-gold text-white py-4 rounded-full font-bold active:scale-95 transition-all duration-300 uppercase text-xs tracking-wider shadow-md cursor-pointer"
               >
-                <MessageCircle className="w-4.5 h-4.5" />
-                <span>Encargar pieza similar</span>
-              </a>
+                <ShoppingCart className="w-4.5 h-4.5" />
+                <span>Añadir al Carrito de Compras</span>
+              </button>
+            ) : (
+              <button
+                disabled
+                className="w-full flex items-center justify-center space-x-2 border-2 border-cream-dark text-chocolate-light/50 py-4 rounded-full font-bold text-xs uppercase tracking-wider cursor-not-allowed bg-cream-dark/10"
+              >
+                <span>Esta pieza ya ha sido adquirida</span>
+              </button>
             )}
           </div>
         </div>

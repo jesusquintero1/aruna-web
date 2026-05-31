@@ -97,10 +97,7 @@ export default function Footer() {
                 <MapPin className="w-5 h-5 text-flamenco-claro flex-shrink-0 mt-0.5" />
                 <span>{siteConfig.contact.address}</span>
               </li>
-              <li className="flex items-center space-x-3">
-                <Phone className="w-5 h-5 text-flamenco-claro flex-shrink-0" />
-                <span>{siteConfig.contact.whatsapp}</span>
-              </li>
+
               <li className="flex items-center space-x-3">
                 <Mail className="w-5 h-5 text-flamenco-claro flex-shrink-0" />
                 <span>{siteConfig.contact.email}</span>

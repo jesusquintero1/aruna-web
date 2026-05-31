@@ -143,37 +143,31 @@ export default function ProductCard({ producto }: ProductCardProps) {
           <div className="grid grid-cols-2 gap-2">
             {producto.disponible ? (
               <>
-                {/* WhatsApp direct order */}
-                <a
-                  href={whatsappLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center space-x-1 bg-[#25D366] text-white py-2.5 px-3 rounded-full text-[10px] font-bold hover:bg-[#20ba5a] hover:scale-[1.02] active:scale-95 transition-all duration-300 shadow-sm"
+                {/* Añadir al Carrito */}
+                <button
+                  onClick={() => addToCart(producto)}
+                  className="flex items-center justify-center space-x-1 bg-chocolate text-white py-2.5 px-3 rounded-full text-[10px] font-bold hover:bg-gold hover:text-obsidian hover:scale-[1.02] active:scale-95 transition-all duration-300 shadow-sm cursor-pointer"
                 >
-                  <MessageCircle className="w-3.5 h-3.5 fill-current" />
-                  <span>Pedir</span>
-                </a>
+                  <ShoppingCart className="w-3.5 h-3.5" />
+                  <span>Añadir</span>
+                </button>
 
                 {/* Ver Detalle */}
                 <Link
-                  href={`/producto/[id]`}
-                  as={`/producto/${producto.id}`}
-                  className="flex items-center justify-center space-x-1 border border-white/10 hover:border-gold hover:text-gold text-sand py-2.5 px-3 rounded-full text-[10px] font-bold hover:scale-[1.02] active:scale-95 transition-all duration-300"
+                  href={`/producto/${producto.id}`}
+                  className="flex items-center justify-center space-x-1 border border-cream-dark/60 hover:border-gold hover:text-gold text-sand py-2.5 px-3 rounded-full text-[10px] font-bold hover:scale-[1.02] active:scale-95 transition-all duration-300"
                 >
                   <span>Detalles</span>
                   <ArrowRight className="w-3 h-3" />
                 </Link>
               </>
             ) : (
-              <a
-                href={getProductWhatsappLink({ ...producto, precio: 0 })}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="col-span-2 flex items-center justify-center space-x-1.5 border border-white/10 hover:border-gold hover:text-gold text-sand-muted py-2.5 px-3 rounded-full text-[10px] font-bold transition-all duration-300"
+              <Link
+                href={`/producto/${producto.id}`}
+                className="col-span-2 flex items-center justify-center space-x-1.5 border border-cream-dark/60 hover:border-gold hover:text-gold text-sand-muted py-2.5 px-3 rounded-full text-[10px] font-bold transition-all duration-300"
               >
-                <MessageCircle className="w-3.5 h-3.5" />
-                <span>Preguntar disponibilidad</span>
-              </a>
+                <span>Ver Detalles de Pieza</span>
+              </Link>
             )}
           </div>
         </div>
