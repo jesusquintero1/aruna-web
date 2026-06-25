@@ -2,6 +2,7 @@ import React from "react";
 import type { Metadata } from "next";
 import ProductGrid from "@/components/ProductGrid";
 import { WayuuDivider, LirioIcon, DelfinIcon } from "@/components/FaunaFloraIcons";
+import { getProducts } from "@/lib/db/products";
 
 export const metadata: Metadata = {
   title: "Catálogo de Mochilas Wayuu Originales",
@@ -11,13 +12,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function CatalogoPage() {
+export const revalidate = 60;
+
+export default async function CatalogoPage() {
+  const products = await getProducts();
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12 min-h-[70vh]">
       {/* Cabecera del Catálogo */}
       <div className="text-center space-y-4 max-w-xl mx-auto relative">
         <span className="text-xs uppercase font-bold tracking-widest text-cardenal block">Galería Ancestral</span>
-        <h1 className="font-display font-black text-4xl sm:text-5xl text-carbon">Colección ARUNA</h1>
+        <h1 className="font-lux font-bold text-4xl sm:text-5xl text-carbon">Colección ARUNA</h1>
         <p className="text-sm text-carbon/75 font-medium leading-relaxed">
           Cada mochila es una obra de arte tejida en un ciclo de 25 días. Al comprar una mochila Aruna, te llevas una pieza irrepetible y apoyas directamente al pueblo artesano de La Guajira.
         </p>
@@ -35,7 +40,7 @@ export default function CatalogoPage() {
       </div>
 
       {/* Grid de Productos con filtros integrados */}
-      <ProductGrid />
+      <ProductGrid products={products} />
     </div>
   );
 }

@@ -1,137 +1,323 @@
 @import "tailwindcss";
 
+/* ============================================================
+   ARUNA · SISTEMA DE DISEÑO "LUJO CARIBE WAYUU"
+   Joya artesanal de alto valor. Turquesa Caribe + Rosa Flamenco
+   + acentos de oro champán. Editorial, sofisticado y muy atractivo.
+   Animaciones novedosas + psicología de venta.
+   ============================================================ */
+
 @theme {
-  --color-terracotta: #c96541; /* Arcilla de La Guajira - Tono Primario */
-  --color-terracotta-light: #f5ebe6;
-  --color-caribe: #1f8a94; /* Mar Caribe de Cabo de la Vela - Tono Secundario */
-  --color-caribe-light: #e6f3f4;
-  --color-cardenal: #c1272d; /* Rojo Cardenal Guajiro - Acento Intenso */
-  --color-cactus: #526b43; /* Verde Cardón - Paisaje Guajiro */
-  --color-cardon: #526b43; /* Verde Cardón */
-  --color-cream: #faf7f2; /* Arena de Taroa y Hilo de Algodón Crudo - Fondo */
-  --color-cream-dark: #e3dbd0;
-  --color-chocolate: #35251e; /* Carbón y Tierra - Texto Contraste */
-  --color-chocolate-light: #5a4b45;
-  --color-carbon: #35251e; /* Carbón oscuro para fondos contrastados y texto nítido */
-  --color-arena: #faf7f2; /* Arena clara de Taroa - color claro de fondo */
-  --color-arena-oscura: #e3dbd0; /* Arena tostada para bordes y separadores */
-  --color-gold: #c96541; /* Mapeado a Terracotta */
-  --color-obsidian: #faf7f2; /* Mapeado a Cream */
-  --color-surface: #f7f2e8; /* Paneles beige fibra natural */
-  --color-surface-card: #eee6da;
-  --color-sand: #35251e; /* Mapeado a Chocolate */
-  --color-sand-muted: #5a4b45;
-  --color-flamingo: #ec6f8e;
-  --color-flamenco: #ec6f8e;
-  --color-flamenco-claro: #f59db1;
-  --color-purple: #c96541;
-  
+  /* --- PALETA VIBRANTE PRINCIPAL --- */
+  --color-caribe: #0c97a6;          /* Turquesa Caribe — PRIMARIO (más profundo) */
+  --color-caribe-deep: #076974;
+  --color-caribe-light: #e2f4f6;
+
+  --color-flamenco: #e0356f;        /* Rosa Flamenco — SECUNDARIO (más joya) */
+  --color-flamingo: #e0356f;
+  --color-flamenco-claro: #ff7aa6;
+  --color-flamenco-light: #fde3ec;
+  --color-desert-rose: #e0356f;
+
+  --color-terracotta: #d9582f;      /* Terracota — ACENTO CÁLIDO */
+  --color-terracotta-light: #fbe7df;
+  --color-sol: #e8a521;             /* Amarillo Sol guajiro */
+
+  /* --- ORO CHAMPÁN (lujo) --- */
+  --color-gold-lux: #c8a24a;
+  --color-gold-soft: #e8d9a8;
+  --color-gold-deep: #9c7c2e;
+
+  --color-cardenal: #cf322c;
+  --color-cactus: #3f8f48;
+  --color-cardon: #3f8f48;
+  --color-purple: #9b59b6;
+
+  /* --- NEUTRALES CÁLIDOS DE LUJO --- */
+  --color-cream: #fbf7f0;           /* lino marfil */
+  --color-cream-dark: #e7dccb;
+  --color-arena: #fbf7f0;
+  --color-arena-oscura: #e3d4bf;
+  --color-chocolate: #122b32;       /* tinta teal profunda — texto */
+  --color-chocolate-light: #56707a;
+  --color-carbon: #0a1f24;          /* casi negro teal — secciones oscuras de lujo */
+  --color-ink: #0a1f24;
+
+  /* --- ALIAS (compatibilidad código existente) --- */
+  --color-obsidian: #fbf7f0;
+  --color-sand: #122b32;
+  --color-sand-muted: #5d757e;
+  --color-gold: #c8a24a;            /* highlight = oro champán de lujo */
+  --color-surface: #ffffff;
+  --color-surface-card: #fdf6ec;
+
+  /* --- TIPOGRAFÍAS --- */
+  --font-serif: var(--font-playfair), Georgia, serif;   /* titulares editoriales */
   --font-title: var(--font-syne), var(--font-sans), sans-serif;
+  --font-display: var(--font-syne), var(--font-sans), sans-serif;
   --font-sans: var(--font-plus-jakarta-sans), sans-serif;
+
+  /* Curva de easing de lujo (easeOutExpo) */
+  --ease-lux: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 :root {
-  --background: #faf7f2;
-  --foreground: #35251e;
+  --background: #fbf7f0;
+  --foreground: #122b32;
 }
 
 body {
   background-color: var(--background);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M0 0 H20 M0 5 H20 M0 10 H20 M0 15 H20 M0 0 V20 M5 0 V20 M10 0 V20 M15 0 V20' stroke='%2335251e' stroke-width='0.4' stroke-opacity='0.012' fill='none'/%3E%3C/svg%3E");
   color: var(--foreground);
   font-family: var(--font-sans);
   overflow-x: hidden;
 }
 
-/* --- DYNAMIC FLOATING AURA GLOWS --- */
+/* Grano sutil de papel/lino para textura de lujo */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Titular serif de lujo */
+.font-lux {
+  font-family: var(--font-serif);
+  letter-spacing: -0.01em;
+}
+
+/* ============================================================
+   GRADIENTES Y BLOQUES DE COLOR
+   ============================================================ */
+.bg-caribe-flamenco {
+  background-image: linear-gradient(125deg, var(--color-caribe-deep) 0%, var(--color-caribe) 45%, var(--color-flamenco) 100%);
+}
+.bg-flamenco-sol {
+  background-image: linear-gradient(125deg, var(--color-flamenco) 0%, var(--color-sol) 100%);
+}
+.bg-terracotta-flamenco {
+  background-image: linear-gradient(125deg, var(--color-terracotta) 0%, var(--color-flamenco) 100%);
+}
+.bg-ink-lux {
+  background-color: var(--color-carbon);
+  background-image:
+    radial-gradient(60% 80% at 15% 0%, rgba(12,151,166,0.25) 0%, transparent 60%),
+    radial-gradient(50% 70% at 100% 100%, rgba(224,53,111,0.22) 0%, transparent 60%);
+}
+.text-gradient-vibrante {
+  background-image: linear-gradient(100deg, var(--color-caribe) 0%, var(--color-flamenco) 60%, var(--color-terracotta) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.text-gradient-gold {
+  background-image: linear-gradient(100deg, var(--color-gold-deep) 0%, var(--color-gold-soft) 45%, var(--color-gold-lux) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Borde dorado de lujo */
+.border-gold-lux {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--color-surface), var(--color-surface)) padding-box,
+    linear-gradient(120deg, var(--color-gold-deep), var(--color-gold-soft), var(--color-gold-lux)) border-box;
+}
+
+/* ============================================================
+   BOTONES (CTAs de conversión, refinados)
+   ============================================================ */
+.btn-primary {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-image: linear-gradient(120deg, var(--color-flamenco) 0%, var(--color-terracotta) 100%);
+  color: #fff;
+  font-weight: 700;
+  border-radius: 9999px;
+  overflow: hidden;
+  box-shadow: 0 12px 30px -10px rgba(224, 53, 111, 0.5);
+  transition: transform 0.4s var(--ease-lux), box-shadow 0.4s var(--ease-lux);
+}
+.btn-primary::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,0.45), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.7s var(--ease-lux);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 40px -10px rgba(224, 53, 111, 0.55);
+}
+.btn-primary:hover::after { left: 130%; }
+.btn-primary:active { transform: scale(0.98); }
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--color-chocolate);
+  color: #fff;
+  font-weight: 700;
+  border-radius: 9999px;
+  transition: transform 0.4s var(--ease-lux), background 0.4s var(--ease-lux);
+}
+.btn-secondary:hover { transform: translateY(-2px); background: var(--color-caribe-deep); }
+.btn-secondary:active { transform: scale(0.98); }
+
+/* Botón de oro de lujo */
+.btn-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-image: linear-gradient(120deg, var(--color-gold-deep), var(--color-gold-lux) 50%, var(--color-gold-soft));
+  color: var(--color-carbon);
+  font-weight: 800;
+  border-radius: 9999px;
+  box-shadow: 0 12px 30px -12px rgba(200,162,74,0.7);
+  transition: transform 0.4s var(--ease-lux), filter 0.4s var(--ease-lux);
+}
+.btn-gold:hover { transform: translateY(-2px); filter: brightness(1.06); }
+.btn-gold:active { transform: scale(0.98); }
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: transparent;
+  color: var(--color-chocolate);
+  border: 1px solid var(--color-chocolate);
+  font-weight: 700;
+  border-radius: 9999px;
+  transition: all 0.4s var(--ease-lux);
+}
+.btn-outline:hover { background: var(--color-chocolate); color: #fff; }
+
+/* ============================================================
+   ANIMACIONES NOVEDOSAS
+   ============================================================ */
+
+/* Marquee */
+@keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+.animate-marquee { animation: marquee 30s linear infinite; white-space: nowrap; display: inline-flex; }
+
+/* Shimmer dorado (texto/badges premium) */
+@keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+.shimmer-gold {
+  background: linear-gradient(100deg, var(--color-gold-deep) 20%, var(--color-gold-soft) 50%, var(--color-gold-deep) 80%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 4s linear infinite;
+}
+
+/* Float suave */
+@keyframes floatY { 0% { transform: translateY(0); } 100% { transform: translateY(-12px); } }
+.animate-float { animation: floatY 5s ease-in-out infinite alternate; }
+
+/* Ken Burns para el héroe */
+@keyframes zoomBg { 0% { transform: scale(1.04); } 100% { transform: scale(1.14); } }
+.animate-zoomBg { animation: zoomBg 20s infinite alternate ease-in-out; }
+
+/* Pulso de escasez (badges de stock) */
+@keyframes pulseRing {
+  0% { box-shadow: 0 0 0 0 rgba(224,53,111,0.45); }
+  70% { box-shadow: 0 0 0 10px rgba(224,53,111,0); }
+  100% { box-shadow: 0 0 0 0 rgba(224,53,111,0); }
+}
+.animate-pulse-ring { animation: pulseRing 2s infinite; }
+
+/* Rotación lenta del sello de lujo */
+@keyframes spinSlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.animate-spin-slow { animation: spinSlow 22s linear infinite; }
+
+/* Colibrí */
+@keyframes colibriFloat { 0% { transform: translateY(0) rotate(0deg); } 100% { transform: translateY(-6px) rotate(8deg); } }
+.animate-colibri { animation: colibriFloat 2.5s infinite alternate ease-in-out; }
+
+/* Glows ambientales */
 .ambient-glow {
   position: absolute;
-  width: 50vw;
-  height: 50vw;
+  width: 45vw;
+  height: 45vw;
   border-radius: 50%;
-  filter: blur(140px);
-  opacity: 0.12;
+  filter: blur(120px);
+  opacity: 0.22;
   pointer-events: none;
   z-index: 0;
-  animation: floatGlow 12s infinite alternate ease-in-out;
+  animation: floatGlow 14s infinite alternate ease-in-out;
 }
+.bg-sunset-glow { background: var(--color-flamenco); }
+.bg-ocean-glow { background: var(--color-caribe); }
+.bg-sol-glow { background: var(--color-sol); }
+.bg-gold-glow { background: var(--color-gold-lux); }
+@keyframes floatGlow { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(5%, 8%) scale(1.15); } }
 
-.bg-sunset-glow {
-  background: #c96541; /* Resplandor de Atardecer Guajiro (Arcilla/Terracotta) */
-}
-
-.bg-ocean-glow {
-  background: #1f8a94; /* Resplandor del Mar Caribe (Cabo de la Vela) */
-}
-
-@keyframes floatGlow {
-  0% { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(5%, 8%) scale(1.15); }
-}
-
-/* Glassmorphism premium light (Misolé-inspired, fiber-textured) */
+/* ============================================================
+   PANELES Y TARJETAS
+   ============================================================ */
 .glass-panel {
-  background: rgba(247, 242, 232, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(53, 37, 30, 0.08);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(18, 43, 50, 0.08);
+}
+.glass-dark {
+  background: rgba(10, 31, 36, 0.55);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.12);
 }
 
-.glass-panel-light {
-  background: rgba(250, 247, 242, 0.5);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(53, 37, 30, 0.04);
+.card-pop {
+  background: #fff;
+  border: 1px solid var(--color-cream-dark);
+  border-radius: 26px;
+  transition: transform 0.5s var(--ease-lux), box-shadow 0.5s var(--ease-lux), border-color 0.5s var(--ease-lux);
+}
+.card-pop:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 30px 60px -28px rgba(18, 43, 50, 0.35);
+  border-color: var(--color-gold-lux);
 }
 
-/* Ocultar barra de scroll pero mantener funcionalidad */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+/* ============================================================
+   SCROLL / UTILIDADES
+   ============================================================ */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* Animación de zoom de imagen Hero */
-@keyframes zoomBg {
-  0% { transform: scale(1.02); }
-  100% { transform: scale(1.08); }
-}
-
-.animate-zoomBg {
-  animation: zoomBg 20s infinite alternate ease-in-out;
-}
-
-/* Pulso del Logo */
-@keyframes pulseLogo {
-  0% { transform: scale(1); opacity: 0.7; }
-  100% { transform: scale(1.2) rotate(15deg); opacity: 1; filter: drop-shadow(0 0 5px #c96541); }
-}
-
-.animate-pulseLogo {
-  animation: pulseLogo 3s infinite alternate ease-in-out;
-}
-
-/* Borde geométrico Wayuu (Cenefa Terracotta) */
 .bg-kana-border {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='20' viewBox='0 0 40 20'%3E%3Cpath d='M0 0 L10 10 L20 0 L30 10 L40 0 M0 20 L10 10 L20 20 L30 10 L40 20' fill='none' stroke='%23c96541' stroke-width='2'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='20' viewBox='0 0 40 20'%3E%3Cpath d='M0 0 L10 10 L20 0 L30 10 L40 0 M0 20 L10 10 L20 20 L30 10 L40 20' fill='none' stroke='%23c8a24a' stroke-width='2'/%3E%3C/svg%3E");
   background-repeat: repeat-x;
   height: 20px;
 }
-
-/* Patrón de tejido general sutil (Textura de Hilo) */
 .bg-kana {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M0 30 L30 0 L60 30 L30 60 Z M30 30 L30 30' fill='none' stroke='%2335251e' stroke-width='1.5' stroke-opacity='0.08'/%3E%3Cpath d='M0 0 L15 15 L30 0 L45 15 L60 0' fill='none' stroke='%2335251e' stroke-width='1' stroke-opacity='0.04'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M0 30 L30 0 L60 30 L30 60 Z' fill='none' stroke='%23122b32' stroke-width='1.5' stroke-opacity='0.06'/%3E%3Cpath d='M0 0 L15 15 L30 0 L45 15 L60 0' fill='none' stroke='%23122b32' stroke-width='1' stroke-opacity='0.04'/%3E%3C/svg%3E");
   background-repeat: repeat;
 }
 
-/* Foco visible */
 .focus-ring:focus-visible {
-  outline: 2px solid #c96541;
+  outline: 2px solid var(--color-gold-lux);
   outline-offset: 4px;
 }
 
-/* prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-delay: 0s !important;
@@ -140,4 +326,5 @@ body {
     transition-duration: 0s !important;
     scroll-behavior: auto !important;
   }
+  body::before { display: none; }
 }

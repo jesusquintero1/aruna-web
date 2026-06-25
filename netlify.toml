@@ -1,0 +1,12 @@
+# Configuración de Netlify para Next.js con servidor (SSR, API, Server Actions).
+# El plugin oficial habilita funciones de servidor — ya NO es un sitio estático.
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

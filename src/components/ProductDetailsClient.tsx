@@ -4,9 +4,9 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Producto } from "@/data/productos";
-import { formatPrice, getProductWhatsappLink } from "@/lib/utils";
+import { formatPrice } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
-import { ShoppingCart, MessageCircle, ArrowLeft, Shield, Sparkles, HeartHandshake, Truck, Check, Info } from "lucide-react";
+import { ShoppingCart, ArrowLeft, Shield, Sparkles, HeartHandshake, Truck, Check, Info } from "lucide-react";
 import { motion } from "framer-motion";
 import { WayuuDivider } from "@/components/FaunaFloraIcons";
 
@@ -18,7 +18,6 @@ interface ProductDetailsClientProps {
 export default function ProductDetailsClient({ producto, productosRelacionados }: ProductDetailsClientProps) {
   const [activeImage, setActiveImage] = useState(producto.imagenes[0]);
   const { addToCart } = useCart();
-  const whatsappLink = getProductWhatsappLink(producto);
 
   // Determinar dinámicamente el tamaño y capacidad de la mochila (Fiel a la UX de Ben & Frank)
   const isMini = producto.id.toLowerCase().includes("mini") || producto.id.toLowerCase().includes("sususu");
@@ -244,7 +243,7 @@ export default function ProductDetailsClient({ producto, productosRelacionados }
             {producto.disponible ? (
               <button
                 onClick={() => addToCart(producto)}
-                className="w-full flex items-center justify-center space-x-2 bg-chocolate hover:bg-gold text-white py-4 rounded-full font-bold active:scale-95 transition-all duration-300 uppercase text-xs tracking-wider shadow-md cursor-pointer"
+                className="btn-primary w-full py-4 uppercase text-xs tracking-wider cursor-pointer"
               >
                 <ShoppingCart className="w-4.5 h-4.5" />
                 <span>Añadir al Carrito de Compras</span>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { productos } from "@/data/productos";
+import { productos as fallbackProductos, type Producto } from "@/data/productos";
 import { simbolosData } from "@/data/simbolos";
 import ProductCard from "./ProductCard";
 import { motion, AnimatePresence } from "framer-motion";
@@ -9,16 +9,20 @@ import { Sparkles } from "lucide-react";
 
 interface ProductGridProps {
   onlyFeatured?: boolean;
+  /** Productos desde la DB. Si no se pasa, usa el array de fallback. */
+  products?: Producto[];
 }
 
-export default function ProductGrid({ onlyFeatured = false }: ProductGridProps) {
+export default function ProductGrid({ onlyFeatured = false, products }: ProductGridProps) {
   const [activeSymbol, setActiveSymbol] = useState<string | null>(null);
   const [availabilityFilter, setAvailabilityFilter] = useState<"todas" | "disponibles">("todas");
 
+  const source = products ?? fallbackProductos;
+
   // Filtrar productos
   let filteredProducts = onlyFeatured
-    ? productos.filter((p) => p.destacado)
-    : productos;
+    ? source.filter((p) => p.destacado)
+    : source;
 
   // Aplicar filtro de disponibilidad
   if (availabilityFilter === "disponibles") {

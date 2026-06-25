@@ -1,11 +1,7 @@
 import type { Metadata } from "next";
-import { Syne, Plus_Jakarta_Sans } from "next/font/google";
+import { Syne, Plus_Jakarta_Sans, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import WhatsAppButton from "@/components/WhatsAppButton";
-import CartDrawer from "@/components/CartDrawer";
 import { siteConfig } from "@/config/site";
 
 // Cargar fuentes de Google Fonts optimizadas con next/font
@@ -21,6 +17,15 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   display: "swap",
   weight: ["300", "400", "500", "600", "700"],
+});
+
+// Serif editorial de lujo para titulares de alto valor
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "500", "600", "700", "800", "900"],
+  style: ["normal", "italic"],
 });
 
 // Metadatos globales optimizados para SEO de primer nivel
@@ -62,22 +67,10 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${syne.variable} ${plusJakartaSans.variable} h-full antialiased`}
+      className={`${syne.variable} ${plusJakartaSans.variable} ${playfair.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-obsidian text-sand selection:bg-gold/25 selection:text-gold">
-        <CartProvider>
-          {/* Cabecera */}
-          <Header />
-          
-          {/* Contenido Principal */}
-          <main className="flex-grow pt-28 sm:pt-32">{children}</main>
-          
-          {/* CartDrawer */}
-          <CartDrawer />
-          
-          {/* Pie de Página */}
-          <Footer />
-        </CartProvider>
+        <CartProvider>{children}</CartProvider>
       </body>
     </html>
   );

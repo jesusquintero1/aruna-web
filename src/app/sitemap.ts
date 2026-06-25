@@ -1,18 +1,16 @@
 import { MetadataRoute } from "next";
-import { productos } from "@/data/productos";
 import { siteConfig } from "@/config/site";
+import { getProducts } from "@/lib/db/products";
 
-export const dynamic = "force-static";
+export const revalidate = 60;
 
 /**
- * Generador Dinámico de Sitemap para Next.js App Router.
- * Se compila automáticamente y se sirve en `/sitemap.xml`.
- * Impulsa enormemente la indexación de productos individuales en Google.
+ * Generador dinámico de Sitemap. Los productos se leen desde la DB.
+ * Se sirve en `/sitemap.xml` e impulsa la indexación en Google.
  */
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = siteConfig.url;
 
-  // Rutas estáticas principales
   const staticRoutes = ["", "/catalogo", "/historia", "/blog"].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
@@ -20,7 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: route === "" ? (1.0 as const) : (0.8 as const),
   }));
 
-  // Rutas dinámicas de detalles de productos
+  const productos = await getProducts();
   const productRoutes = productos.map((producto) => ({
     url: `${baseUrl}/producto/${producto.id}`,
     lastModified: new Date(),

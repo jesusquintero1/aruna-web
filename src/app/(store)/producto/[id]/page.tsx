@@ -1,16 +1,12 @@
 import React from "react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { productos } from "@/data/productos";
 import { siteConfig } from "@/config/site";
 import { formatPrice, getProductSchema } from "@/lib/utils";
+import { getProductById, getRelatedProducts } from "@/lib/db/products";
 import ProductDetailsClient from "@/components/ProductDetailsClient";
 
-export async function generateStaticParams() {
-  return productos.map((producto) => ({
-    id: producto.id,
-  }));
-}
+export const revalidate = 60;
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -21,7 +17,7 @@ interface PageProps {
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const producto = productos.find((p) => p.id === id);
+  const producto = await getProductById(id);
 
   if (!producto) {
     return {
@@ -72,16 +68,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ProductoDetallePage({ params }: PageProps) {
   const { id } = await params;
-  const producto = productos.find((p) => p.id === id);
+  const producto = await getProductById(id);
 
   if (!producto) {
     notFound();
   }
 
-  // Obtener productos relacionados (destacados o de la misma categoría, excluyendo el actual)
-  const productosRelacionados = productos
-    .filter((p) => p.id !== producto.id && p.disponible)
-    .slice(0, 4);
+  // Obtener productos relacionados (excluyendo el actual)
+  const productosRelacionados = await getRelatedProducts(producto.id);
 
   // Schema.org para rastreadores de búsqueda
   const jsonLd = getProductSchema(producto);
