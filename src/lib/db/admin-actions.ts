@@ -57,6 +57,7 @@ export async function saveProduct(formData: FormData): Promise<void> {
   const colores = String(formData.get("colores") || "")
     .split(",").map((c) => c.trim()).filter(Boolean);
   const precio = parseInt(String(formData.get("precio") || "0"), 10) || 0;
+  const costo = parseInt(String(formData.get("costo") || "0"), 10) || 0;
   const precioAnteriorRaw = String(formData.get("precioAnterior") || "").trim();
   const precio_anterior = precioAnteriorRaw ? parseInt(precioAnteriorRaw, 10) : null;
   const stock = parseInt(String(formData.get("stock") || "0"), 10) || 0;
@@ -72,7 +73,7 @@ export async function saveProduct(formData: FormData): Promise<void> {
   const imagenes = [...keep, ...nuevas];
 
   const row = {
-    id, nombre, descripcion, precio, precio_anterior,
+    id, nombre, descripcion, precio, costo, precio_anterior,
     imagenes, colores, categoria_id, simbolo, destacado, stock,
   };
 

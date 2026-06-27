@@ -5,12 +5,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { logoutAction } from "@/lib/auth/actions";
 import {
-  LayoutDashboard, Package, Tags, ShoppingBag, Calculator, LogOut, Menu, X, Store,
+  LayoutDashboard, Package, Tags, ShoppingBag, Calculator, LogOut, Menu, X, Store, Truck,
 } from "lucide-react";
 
 const links = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard, exact: true },
   { name: "Productos", href: "/admin/productos", icon: Package },
+  { name: "Compras", href: "/admin/compras", icon: Truck },
   { name: "Categorías", href: "/admin/categorias", icon: Tags },
   { name: "Pedidos", href: "/admin/pedidos", icon: ShoppingBag },
   { name: "POS · Vender", href: "/admin/pos", icon: Calculator },

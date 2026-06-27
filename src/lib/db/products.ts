@@ -2,9 +2,10 @@ import "server-only";
 import { getSupabase } from "@/lib/supabase/server";
 import { productos as fallbackProductos, type Producto } from "@/data/productos";
 
-/** Producto con campos adicionales que solo necesita el admin (stock, categoría id). */
+/** Producto con campos adicionales que solo necesita el admin (stock, costo, categoría id). */
 export interface ProductoAdmin extends Producto {
   stock: number;
+  costo: number;
   categoriaId: string | null;
 }
 
@@ -13,6 +14,7 @@ interface ProductRow {
   nombre: string;
   descripcion: string;
   precio: number;
+  costo: number | null;
   precio_anterior: number | null;
   imagenes: string[];
   colores: string[];
@@ -37,6 +39,7 @@ function mapRow(row: ProductRow): ProductoAdmin {
     destacado: row.destacado,
     simbolo: row.simbolo,
     stock: row.stock,
+    costo: row.costo ?? 0,
     categoriaId: row.categoria_id,
   };
 }
@@ -80,7 +83,7 @@ export async function getRelatedProducts(id: string): Promise<Producto[]> {
 export async function getProductsAdmin(): Promise<ProductoAdmin[]> {
   const db = getSupabase();
   if (!db) {
-    return fallbackProductos.map((p) => ({ ...p, stock: p.disponible ? 1 : 0, categoriaId: null }));
+    return fallbackProductos.map((p) => ({ ...p, stock: p.disponible ? 1 : 0, costo: 0, categoriaId: null }));
   }
   const { data, error } = await db.from("products").select(SELECT).order("created_at", { ascending: false });
   if (error || !data) return [];
@@ -92,7 +95,7 @@ export async function getProductAdminById(id: string): Promise<ProductoAdmin | n
   const db = getSupabase();
   if (!db) {
     const p = fallbackProductos.find((x) => x.id === id);
-    return p ? { ...p, stock: p.disponible ? 1 : 0, categoriaId: null } : null;
+    return p ? { ...p, stock: p.disponible ? 1 : 0, costo: 0, categoriaId: null } : null;
   }
   const { data, error } = await db.from("products").select(SELECT).eq("id", id).maybeSingle();
   if (error || !data) return null;

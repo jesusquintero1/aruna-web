@@ -56,17 +56,26 @@ export default function ProductForm({ producto, categorias }: { producto?: Produ
 
           <div className="grid sm:grid-cols-3 gap-4">
             <div className="space-y-1.5">
-              <label className={label}>Precio (COP) *</label>
-              <input name="precio" type="number" defaultValue={producto?.precio} required className={field} placeholder="290000" />
+              <label className={label}>Precio de costo (COP)</label>
+              <input name="costo" type="number" defaultValue={producto?.costo} className={field} placeholder="90000" />
+              <p className="text-[11px] text-chocolate-light">Lo que te costó la pieza.</p>
             </div>
             <div className="space-y-1.5">
-              <label className={label}>Precio anterior</label>
-              <input name="precioAnterior" type="number" defaultValue={producto?.precioAnterior} className={field} placeholder="350000" />
+              <label className={label}>Precio de venta (COP) *</label>
+              <input name="precio" type="number" defaultValue={producto?.precio} required className={field} placeholder="180000" />
+              <p className="text-[11px] text-chocolate-light">Lo que paga el cliente.</p>
             </div>
             <div className="space-y-1.5">
               <label className={label}>Stock *</label>
               <input name="stock" type="number" defaultValue={producto?.stock ?? 1} required className={field} placeholder="1" />
+              <p className="text-[11px] text-chocolate-light">Unidades disponibles.</p>
             </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className={label}>Precio anterior / tachado (opcional)</label>
+            <input name="precioAnterior" type="number" defaultValue={producto?.precioAnterior} className={`${field} sm:max-w-[12rem]`} placeholder="220000" />
+            <p className="text-[11px] text-chocolate-light">Solo si quieres mostrar un descuento: aparece tachado junto al precio de venta.</p>
           </div>
 
           <div className="space-y-1.5">
