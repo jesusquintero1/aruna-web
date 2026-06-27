@@ -1,27 +1,23 @@
 /**
  * SISTEMA DE PRODUCTOS "ARÜNA" - LISTO PARA EDITAR
- * 
- * Sigue estos sencillos pasos para agregar, modificar o eliminar productos en tu tienda:
- * 
- * PASO 1: Consigue las fotografías de tu producto.
- *         Sube las imágenes a la carpeta `/public/productos/` o `/public/images/` en tu proyecto.
- *         Se recomienda que las fotos sean cuadradas o verticales (relación de aspecto 1:1 o 3:4) y tengan fondo limpio.
- * 
- * PASO 2: Abre este archivo y agrega un nuevo objeto al array `productos` a continuación.
- *         Copia y pega uno de los ejemplos existentes y edita sus propiedades:
- * 
- *         - `id`: Un identificador único corto, sin espacios ni caracteres especiales. Ejemplo: "mochila-sususu"
- *         - `nombre`: El título del producto que verán tus clientes. Ejemplo: "Mochila Sususu Terracota"
- *         - `precio`: El precio de venta en pesos colombianos (COP) como número entero. Ejemplo: 280000
- *         - `precioAnterior`: (Opcional) Precio original si tiene descuento. Muestra un tachado tachado. Ejemplo: 340000
- *         - `imagenes`: Array de rutas a las imágenes. La primera será la principal.
- *                      Puedes usar rutas locales como "/images/mochila_cardenal.png" o URLs completas.
- *         - `descripcion`: Párrafo descriptivo donde explicas el significado de su tejido, dimensiones y materiales.
- *         - `colores`: Colores predominantes en el tejido para que la gente los conozca. Ejemplo: ["Terracota", "Crema", "Marrón"]
- *         - `categoria`: La categoría del producto. Por defecto "mochilas".
- *         - `disponible`: `true` si se puede comprar, `false` si ya se vendió (mostrará etiqueta "Agotada").
- *         - `destacado`: `true` para que aparezca en la página de inicio en la sección de destacados.
- *         - `simbolo`: El símbolo sagrado que inspiró el tejido. Puede ser: "colibri", "flamenco", "cardenal", "cactus", "lirios", "delfines".
+ *
+ * IMPORTANTE: La tienda lee los productos desde la base de datos (Supabase).
+ * Este archivo es la fuente para el seed (`npm run seed:products`) y el fallback
+ * en modo demo. Para que un cambio aquí se refleje en la tienda en vivo hay que
+ * correr el seed o editar el producto desde el panel /admin.
+ *
+ * Para agregar un producto, copia uno de los objetos del array `productos` y edita:
+ *   - `id`: identificador único corto, sin espacios. Ej: "mochila-bordada-champagne"
+ *   - `nombre`: título visible. Ej: "Mochila Bordada Champagne"
+ *   - `precio`: precio de venta en COP (entero). Ej: 450000
+ *   - `precioAnterior`: (opcional) precio original tachado.
+ *   - `imagenes`: rutas a las fotos. La primera es la principal. Ej: "/productos/foo.jpg"
+ *   - `descripcion`: párrafo con el significado del tejido, materiales y detalles.
+ *   - `colores`: colores predominantes. Ej: ["Marfil", "Dorado", "Perla"]
+ *   - `categoria`: agrupa el producto. Ej: "Edición Bordada de Lujo"
+ *   - `disponible`: true si se puede comprar, false para etiqueta "Agotada".
+ *   - `destacado`: true para mostrarlo en la página de inicio.
+ *   - `simbolo`: "colibri" | "flamenco" | "cardenal" | "cactus" | "lirios" | "delfines"
  */
 
 export interface Producto {
@@ -40,64 +36,97 @@ export interface Producto {
 
 export const productos: Producto[] = [
   {
-    id: "mochila-arutka-cardenal",
-    nombre: "Mochila Arutka Cardenal",
-    precio: 290000,
-    precioAnterior: 350000,
+    id: "mochila-bordada-champagne",
+    nombre: "Mochila Bordada Champagne",
+    precio: 450000,
     imagenes: [
-      "/images/mochila_cardenal.png",
-      "/images/mochila_colibri.png"
+      "/productos/bordada-champagne-1.jpg",
+      "/productos/bordada-champagne-2.jpg",
+      "/productos/bordada-champagne-3.jpg"
     ],
-    descripcion: "Tejida en un profundo color Cardenal combinado con tonos arena, la mochila Arutka representa los caminos del desierto guajiro. Su diseño de un solo hilo (hebra fina) requiere 25 días de minucioso trabajo. Los Kanas (patrones geométricos) en el cuerpo simbolizan el caparazón de la tortuga (Irapa), portador de la sabiduría y resiliencia de la cultura Wayuu.",
-    colores: ["Cardenal Rojo", "Arena Cálida", "Negro Carbón"],
-    categoria: "Mochila Un Hilo",
+    descripcion: "Una pieza de alta joyería textil. Sobre una base tejida a mano en marfil, las maestras aplican un bordado de encaje con lentejuelas y perlas doradas cosidas una a una, creando un jardín de flores que atrapa la luz. Rematada con borlas en hilo crudo y cuentas perladas. Es la mochila ideal para una novia, una velada especial o quien busca una pieza irrepetible de lujo artesanal.",
+    colores: ["Marfil", "Dorado Champagne", "Perla"],
+    categoria: "Edición Bordada de Lujo",
     disponible: true,
     destacado: true,
-    simbolo: "cardenal"
+    simbolo: "lirios"
   },
   {
-    id: "mochila-iguaraya-desierto",
-    nombre: "Mochila Iguaraya Desierto",
+    id: "mochila-bordada-cacao",
+    nombre: "Mochila Bordada Cacao",
+    precio: 450000,
+    imagenes: [
+      "/productos/bordada-cacao-1.jpg",
+      "/productos/bordada-cacao-2.jpg",
+      "/productos/bordada-cacao-3.jpg"
+    ],
+    descripcion: "Elegancia en tono tierra. Tejida en un cálido color cacao y vestida con un bordado de mostacilla y canutillo dorado que dibuja un gran medallón solar, símbolo de la energía de La Guajira. Las perlas cobre y los detalles en relieve le dan textura y profundidad. Sus borlas en hilo a tono y cuentas perladas completan una pieza sobria, sofisticada y profundamente artesanal.",
+    colores: ["Cacao", "Oro Viejo", "Cobre"],
+    categoria: "Edición Bordada de Lujo",
+    disponible: true,
+    destacado: true,
+    simbolo: "lirios"
+  },
+  {
+    id: "mochila-bordada-oro-rosa",
+    nombre: "Mochila Bordada Oro Rosa",
+    precio: 450000,
+    imagenes: [
+      "/productos/bordada-oro-rosa-1.jpg",
+      "/productos/bordada-oro-rosa-2.jpg",
+      "/productos/bordada-oro-rosa-3.jpg"
+    ],
+    descripcion: "Romanticismo tejido. Sobre una base crema, un delicado bordado de lentejuelas en oro rosa forma flores y enredaderas, acentuadas con perlas doradas y nacaradas. El brillo cobrizo y rosado le da un aire moderno y femenino sin perder la raíz ancestral. Acabada con borlas blancas y cuentas perladas: una pieza luminosa, única y llena de detalle.",
+    colores: ["Crema", "Oro Rosa", "Perla"],
+    categoria: "Edición Bordada de Lujo",
+    disponible: true,
+    destacado: true,
+    simbolo: "lirios"
+  },
+  {
+    id: "mochila-luxe-plata",
+    nombre: "Mochila Luxe Plata",
     precio: 320000,
     imagenes: [
-      "/images/mochila_iguaraya.png",
-      "/images/mochila_cardenal.png"
+      "/productos/luxe-plata-1.jpg",
+      "/productos/luxe-plata-2.jpg"
     ],
-    descripcion: "Inspirada en el verde del cactus Cardón y los tonos terracota de los atardeceres de Maicao, la mochila Iguaraya es una oda a la flora de La Guajira. Esta pieza cuenta con una gasa tejida en telar tradicional que se adapta cómodamente a tu hombro, distribuyendo el peso de manera ideal. Perfecta para un estilo bohemio, sofisticado y auténtico.",
-    colores: ["Verde Cardón", "Terracota", "Crema"],
-    categoria: "Mochila Un Hilo",
+    descripcion: "Minimalismo con brillo. Tejida a mano en hilo metalizado plata, esta mochila de líneas limpias y silueta perfecta prescinde de patrones para dejar que el material hable por sí solo. Su tejido apretado y uniforme refleja la luz con un sutil destello. Atemporal y versátil, combina lo mismo con un look casual de día que con un atuendo de noche.",
+    colores: ["Plata", "Gris Perla"],
+    categoria: "Mochila Luxe Lisa",
     disponible: true,
-    destacado: true,
-    simbolo: "cactus"
-  },
-  {
-    id: "mochila-caribe-flamenco",
-    nombre: "Mochila Caribe Flamenco",
-    precio: 280000,
-    precioAnterior: 310000,
-    imagenes: [
-      "/images/mochila_flamenco.png",
-      "/images/mochila_colibri.png"
-    ],
-    descripcion: "Una explosión de colores que fusiona el azul profundo del mar Caribe con el rosa vibrante de los flamencos del Santuario de Flora y Fauna de la Guajira. Su diseño representa el Molokonoutshi (las costillas del caimán) en una combinación alegre y dinámica. Un testimonio vivo de alegría y tradición hecho de algodón premium de alta resistencia.",
-    colores: ["Flamenco Rosa", "Azul Caribe", "Amarillo Sol"],
-    categoria: "Mochila Un Hilo",
-    disponible: true,
-    destacado: true,
-    simbolo: "flamenco"
-  },
-  {
-    id: "mochila-sususu-crema-agotada",
-    nombre: "Mochila Sususu Crema",
-    precio: 295000,
-    imagenes: [
-      "/images/mochila_colibri.png"
-    ],
-    descripcion: "De elegancia sobria y colores neutros, esta mochila representa la pureza de la arena de la Alta Guajira. Los patrones Kanas se muestran en un beige suave sobre un fondo crema crudo natural. Una pieza sumamente combinable, versátil y atemporal.",
-    colores: ["Crema Natural", "Arena Oscura", "Blanco"],
-    categoria: "Mochila Un Hilo",
-    disponible: false, // ETIQUETA AGOTADA
     destacado: false,
     simbolo: "colibri"
+  },
+  {
+    id: "mochila-luxe-champagne",
+    nombre: "Mochila Luxe Champagne",
+    precio: 320000,
+    imagenes: [
+      "/productos/luxe-champagne-1.jpg",
+      "/productos/luxe-champagne-2.jpg"
+    ],
+    descripcion: "Elegancia discreta en dorado suave. Tejida a mano en hilo metalizado color champagne, de silueta impecable y acabado liso que realza el brillo natural del material. Una pieza sobria y luminosa a la vez, pensada para quien prefiere el lujo silencioso. Su cordón de ajuste y pompones a tono rematan un diseño elegante y fácil de combinar.",
+    colores: ["Champagne", "Dorado Claro"],
+    categoria: "Mochila Luxe Lisa",
+    disponible: true,
+    destacado: false,
+    simbolo: "delfines"
+  },
+  {
+    id: "mochila-kana-arena",
+    nombre: "Mochila Kana Arena",
+    precio: 290000,
+    imagenes: [
+      "/productos/kana-arena-1.jpg",
+      "/productos/kana-arena-2.jpg",
+      "/productos/kana-arena-3.jpg"
+    ],
+    descripcion: "Tradición pura en tonos neutros. Tejida en la técnica clásica de dos hilos, luce Kanas (patrones geométricos ancestrales) en color arena sobre fondo blanco, una paleta serena y elegante que combina con todo. Rematada con gruesos pompones en hilo crudo y su característica gaza trenzada. Una mochila Wayuu auténtica, resistente y atemporal, hecha para acompañarte por años.",
+    colores: ["Arena", "Blanco Hueso", "Beige"],
+    categoria: "Mochila Dos Hilos",
+    disponible: true,
+    destacado: false,
+    simbolo: "cactus"
   }
 ];
