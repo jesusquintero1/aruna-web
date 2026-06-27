@@ -78,7 +78,7 @@ export default function Footer() {
 
           {/* Confianza */}
           <div className="space-y-4">
-            <h4 className="font-title font-bold text-lg text-arena">Confianza Aruna</h4>
+            <h4 className="font-title font-bold text-lg text-arena">Confianza Arüna</h4>
             <div className="space-y-3">
               {trust.map((t, i) => (
                 <div key={i} className="flex items-center gap-2.5 text-xs text-arena/80 bg-white/5 p-2.5 rounded-xl">
@@ -99,7 +99,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-arena/50 gap-4">
-          <p>© {new Date().getFullYear()} ARUNA. Hecho con orgullo en Colombia.</p>
+          <p>© {new Date().getFullYear()} ARÜNA. Hecho con orgullo en Colombia.</p>
           <div className="flex items-center gap-1.5">
             <span>Tejido con</span>
             <Heart className="w-3.5 h-3.5 text-flamenco fill-current" />

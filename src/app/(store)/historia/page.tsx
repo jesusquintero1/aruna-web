@@ -179,7 +179,7 @@ export default function HistoriaPage() {
           <span className="text-xs uppercase font-bold tracking-widest text-cardon">Nuestro Compromiso</span>
           <h2 className="font-display font-black text-3xl text-carbon">Tejiendo un Comercio Justo</h2>
           <p className="text-sm sm:text-base text-carbon/80 leading-relaxed font-medium">
-            En ARUNA creemos firmemente que la preservación de la tradición solo es posible si se honra con dignidad el trabajo de sus creadoras. Por ello, trabajamos bajo un modelo de comercio directo y precio justo.
+            En ARÜNA creemos firmemente que la preservación de la tradición solo es posible si se honra con dignidad el trabajo de sus creadoras. Por ello, trabajamos bajo un modelo de comercio directo y precio justo.
           </p>
           <p className="text-sm sm:text-base text-carbon/80 leading-relaxed font-medium">
             Esto garantiza que el 70% del valor de cada mochila llegue directamente a la maestra artesana que la tejió, permitiéndole sostener su ranchería, educar a sus hijos y adquirir hilos de la mejor calidad para continuar su arte ancestral. Tu compra tiene un impacto directo, real y sostenible.

@@ -68,7 +68,7 @@ export default function ProductDetailsClient({ producto, productosRelacionados }
     name: "Margoth Fontalvo",
     clan: "Pushaina (Tradición y Linaje)",
     experience: "18 Años",
-    bio: "Margoth lidera el taller de tejedoras de ARUNA en la Alta Guajira. Custodia las técnicas tradicionales de hilado y asegura que el 70% de cada venta retorne íntegramente a las artesanas que confeccionan cada obra."
+    bio: "Margoth lidera el taller de tejedoras de ARÜNA en la Alta Guajira. Custodia las técnicas tradicionales de hilado y asegura que el 70% de cada venta retorne íntegramente a las artesanas que confeccionan cada obra."
   };
 
   const artisan = artisanProfiles[producto.id] || defaultArtisan;

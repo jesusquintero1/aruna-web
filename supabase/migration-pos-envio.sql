@@ -1,5 +1,5 @@
 -- ============================================================
--- ARUNA · Migración: datos de envío en pedidos (cédula + departamento)
+-- ARÜNA · Migración: datos de envío en pedidos (cédula + departamento)
 -- Seguro de correr sobre una base de datos YA desplegada.
 -- Ejecuta este archivo completo en: Supabase → SQL Editor → New query
 -- ============================================================

@@ -1,5 +1,5 @@
 /**
- * SISTEMA DE PRODUCTOS "ARUNA" - LISTO PARA EDITAR
+ * SISTEMA DE PRODUCTOS "ARÜNA" - LISTO PARA EDITAR
  * 
  * Sigue estos sencillos pasos para agregar, modificar o eliminar productos en tu tienda:
  * 

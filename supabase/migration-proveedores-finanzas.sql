@@ -1,5 +1,5 @@
 -- ============================================================
--- ARUNA · Migración: pedidos de proveedor + finanzas
+-- ARÜNA · Migración: pedidos de proveedor + finanzas
 -- Seguro de correr sobre una base de datos YA desplegada.
 -- Ejecuta este archivo completo en: Supabase → SQL Editor → New query
 -- ============================================================

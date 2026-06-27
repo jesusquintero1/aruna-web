@@ -16,7 +16,7 @@ export default function AdminLoginPage() {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2">
             <span className="text-gold-lux text-lg">✦</span>
-            <span className="font-lux font-bold text-3xl tracking-[0.25em] text-white uppercase">ARUNA</span>
+            <span className="font-lux font-bold text-3xl tracking-[0.25em] text-white uppercase">ARÜNA</span>
             <span className="text-gold-lux text-lg">✦</span>
           </div>
           <p className="text-[10px] text-white/50 font-bold tracking-[0.4em] uppercase mt-2">Panel de administración</p>
@@ -60,7 +60,7 @@ export default function AdminLoginPage() {
           </button>
         </form>
 
-        <p className="text-center text-white/40 text-xs mt-6">Acceso restringido · Aruna Wayuu</p>
+        <p className="text-center text-white/40 text-xs mt-6">Acceso restringido · Arüna Wayuu</p>
       </div>
     </div>
   );

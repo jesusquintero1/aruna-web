@@ -6,8 +6,8 @@ import { ArrowRight, BookOpen, Clock } from "lucide-react";
 import NewsletterForm from "@/components/NewsletterForm";
 
 export const metadata: Metadata = {
-  title: "El Blog de ARUNA - Cultura y Cuidado de la Mochila Wayuu",
-  description: "Aprende cómo lavar tu mochila Wayuu, conoce la diferencia entre un hilo y dos hilos, descubre mitos de La Guajira y más en el blog oficial de ARUNA.",
+  title: "El Blog de ARÜNA - Cultura y Cuidado de la Mochila Wayuu",
+  description: "Aprende cómo lavar tu mochila Wayuu, conoce la diferencia entre un hilo y dos hilos, descubre mitos de La Guajira y más en el blog oficial de ARÜNA.",
   alternates: {
     canonical: "/blog",
   },
@@ -62,7 +62,7 @@ export default function BlogHubPage() {
       <div className="text-center space-y-4 max-w-xl mx-auto">
         <span className="text-xs uppercase font-bold tracking-widest text-flamenco block flex items-center justify-center gap-2">
           <BookOpen className="w-4 h-4 text-flamenco" />
-          Bitácora Aruna
+          Bitácora Arüna
         </span>
         <h1 className="font-display font-black text-4xl sm:text-5xl text-carbon">Cultura & Saber</h1>
         <p className="text-sm text-carbon/75 font-medium leading-relaxed">
