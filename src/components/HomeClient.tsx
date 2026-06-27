@@ -140,7 +140,7 @@ export default function HomeClient({ featured, disponibles }: HomeClientProps) {
                   <div className="absolute inset-0 animate-zoomBg">
                     <Image
                       src={heroSlides[slide].img}
-                      alt="Mochila Wayuu Aruna de alta artesanía"
+                      alt="Mochila Wayuu Arüna de alta artesanía"
                       fill
                       className="object-cover"
                       sizes="(max-width: 1024px) 100vw, 50vw"
