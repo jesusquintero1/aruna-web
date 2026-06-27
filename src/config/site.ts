@@ -1,5 +1,5 @@
 /**
- * CONFIGURACIÓN GLOBAL DE ARUNA
+ * CONFIGURACIÓN GLOBAL DE ARÜNA
  * 
  * Centraliza toda la información de la tienda.
  * El dueño puede modificar este archivo para cambiar números, enlaces de redes sociales,

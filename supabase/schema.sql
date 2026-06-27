@@ -1,5 +1,5 @@
 -- ============================================================
--- ARUNA · Esquema de base de datos (Supabase / Postgres)
+-- ARÜNA · Esquema de base de datos (Supabase / Postgres)
 -- Ejecuta este archivo completo en: Supabase → SQL Editor → New query
 -- ============================================================
 
