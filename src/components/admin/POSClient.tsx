@@ -5,16 +5,29 @@ import Image from "next/image";
 import { formatPrice } from "@/lib/utils";
 import type { ProductoAdmin } from "@/lib/db/products";
 import { createPosSale } from "@/lib/db/pos-actions";
-import { Plus, Minus, Search, Trash2, CheckCircle2, Receipt, Loader2 } from "lucide-react";
+import { Plus, Minus, Search, CheckCircle2, Receipt, Loader2, Truck } from "lucide-react";
 
 const metodos = ["Efectivo", "Nequi", "Daviplata", "Bancolombia", "Tarjeta"];
+
+const departamentos = [
+  "Amazonas", "Antioquia", "Arauca", "Atlántico", "Bolívar", "Boyacá", "Caldas",
+  "Caquetá", "Casanare", "Cauca", "Cesar", "Chocó", "Córdoba", "Cundinamarca",
+  "Guainía", "Guaviare", "Huila", "La Guajira", "Magdalena", "Meta", "Nariño",
+  "Norte de Santander", "Putumayo", "Quindío", "Risaralda", "San Andrés y Providencia",
+  "Santander", "Sucre", "Tolima", "Valle del Cauca", "Vaupés", "Vichada", "Bogotá D.C.",
+];
 
 export default function POSClient({ products }: { products: ProductoAdmin[] }) {
   const [cart, setCart] = useState<Record<string, number>>({});
   const [query, setQuery] = useState("");
   const [metodo, setMetodo] = useState("Efectivo");
+  const [envio, setEnvio] = useState(false);
   const [cliente, setCliente] = useState("");
   const [telefono, setTelefono] = useState("");
+  const [cedula, setCedula] = useState("");
+  const [direccion, setDireccion] = useState("");
+  const [ciudad, setCiudad] = useState("");
+  const [departamento, setDepartamento] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [doneId, setDoneId] = useState("");
@@ -41,18 +54,40 @@ export default function POSClient({ products }: { products: ProductoAdmin[] }) {
   const total = lines.reduce((s, l) => s + l.p.precio * l.qty, 0);
   const count = lines.reduce((s, l) => s + l.qty, 0);
 
+  const envioIncompleto =
+    envio && (!cliente.trim() || !cedula.trim() || !telefono.trim() || !direccion.trim() || !ciudad.trim() || !departamento.trim());
+
+  const resetCliente = () => {
+    setCliente(""); setTelefono(""); setCedula("");
+    setDireccion(""); setCiudad(""); setDepartamento(""); setEnvio(false);
+  };
+
   const submit = async () => {
     if (!count || submitting) return;
+    if (envioIncompleto) {
+      setError("Completa todos los datos de envío del cliente.");
+      return;
+    }
     setSubmitting(true); setError("");
     const res = await createPosSale({
       items: lines.map((l) => ({ product_id: l.p.id, cantidad: l.qty })),
       metodoPago: metodo,
-      cliente: { nombre: cliente || undefined, telefono: telefono || undefined },
+      cliente: envio
+        ? {
+            nombre: cliente.trim(),
+            telefono: telefono.trim(),
+            cedula: cedula.trim(),
+            direccion: direccion.trim(),
+            ciudad: ciudad.trim(),
+            departamento: departamento.trim(),
+          }
+        : { nombre: cliente.trim() || undefined, telefono: telefono.trim() || undefined },
+      notas: envio ? "Venta para envío" : undefined,
     });
     setSubmitting(false);
     if (res.ok && res.id) {
       setDoneId(res.id);
-      setCart({}); setCliente(""); setTelefono("");
+      setCart({}); resetCliente();
     } else {
       setError(res.error || "No se pudo registrar la venta.");
     }
@@ -135,16 +170,44 @@ export default function POSClient({ products }: { products: ProductoAdmin[] }) {
           </div>
 
           <div className="space-y-2">
-            <input value={cliente} onChange={(e) => setCliente(e.target.value)} placeholder="Cliente (opcional)" className="w-full bg-cream border border-cream-dark rounded-xl px-3 py-2 text-sm font-semibold text-chocolate focus:outline-none focus:border-caribe" />
-            <input value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="Teléfono (opcional)" className="w-full bg-cream border border-cream-dark rounded-xl px-3 py-2 text-sm font-semibold text-chocolate focus:outline-none focus:border-caribe" />
             <select value={metodo} onChange={(e) => setMetodo(e.target.value)} className="w-full bg-cream border border-cream-dark rounded-xl px-3 py-2 text-sm font-semibold text-chocolate focus:outline-none focus:border-caribe">
               {metodos.map((m) => <option key={m} value={m}>{m}</option>)}
             </select>
+
+            {/* ¿Es para envío? */}
+            <label className="flex items-center gap-2.5 cursor-pointer select-none bg-cream border border-cream-dark rounded-xl px-3 py-2.5">
+              <input type="checkbox" checked={envio} onChange={(e) => setEnvio(e.target.checked)} className="w-5 h-5 accent-caribe" />
+              <span className="text-sm font-bold text-chocolate">Es para envío (pedir datos del cliente)</span>
+            </label>
+
+            {!envio ? (
+              <>
+                <input value={cliente} onChange={(e) => setCliente(e.target.value)} placeholder="Cliente (opcional)" className="w-full bg-cream border border-cream-dark rounded-xl px-3 py-2 text-sm font-semibold text-chocolate focus:outline-none focus:border-caribe" />
+                <input value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="Teléfono (opcional)" className="w-full bg-cream border border-cream-dark rounded-xl px-3 py-2 text-sm font-semibold text-chocolate focus:outline-none focus:border-caribe" />
+              </>
+            ) : (
+              <div className="space-y-2 border border-caribe/30 bg-caribe/5 rounded-xl p-3">
+                <p className="text-xs font-black uppercase tracking-wide text-caribe flex items-center gap-1.5"><Truck className="w-4 h-4" /> Datos de envío</p>
+                <input value={cliente} onChange={(e) => setCliente(e.target.value)} placeholder="Nombre completo *" className="w-full bg-white border border-cream-dark rounded-xl px-3 py-2 text-sm font-semibold text-chocolate focus:outline-none focus:border-caribe" />
+                <div className="grid grid-cols-2 gap-2">
+                  <input value={cedula} onChange={(e) => setCedula(e.target.value)} inputMode="numeric" placeholder="Cédula *" className="w-full bg-white border border-cream-dark rounded-xl px-3 py-2 text-sm font-semibold text-chocolate focus:outline-none focus:border-caribe" />
+                  <input value={telefono} onChange={(e) => setTelefono(e.target.value)} inputMode="tel" placeholder="Teléfono *" className="w-full bg-white border border-cream-dark rounded-xl px-3 py-2 text-sm font-semibold text-chocolate focus:outline-none focus:border-caribe" />
+                </div>
+                <input value={direccion} onChange={(e) => setDireccion(e.target.value)} placeholder="Dirección de envío *" className="w-full bg-white border border-cream-dark rounded-xl px-3 py-2 text-sm font-semibold text-chocolate focus:outline-none focus:border-caribe" />
+                <div className="grid grid-cols-2 gap-2">
+                  <input value={ciudad} onChange={(e) => setCiudad(e.target.value)} placeholder="Ciudad *" className="w-full bg-white border border-cream-dark rounded-xl px-3 py-2 text-sm font-semibold text-chocolate focus:outline-none focus:border-caribe" />
+                  <select value={departamento} onChange={(e) => setDepartamento(e.target.value)} className="w-full bg-white border border-cream-dark rounded-xl px-3 py-2 text-sm font-semibold text-chocolate focus:outline-none focus:border-caribe">
+                    <option value="">Departamento *</option>
+                    {departamentos.map((d) => <option key={d} value={d}>{d}</option>)}
+                  </select>
+                </div>
+              </div>
+            )}
           </div>
 
           {error && <p className="text-sm text-flamenco font-semibold text-center bg-flamenco-light rounded-xl py-2">{error}</p>}
 
-          <button onClick={submit} disabled={!count || submitting} className="btn-primary w-full py-3.5 text-sm uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed">
+          <button onClick={submit} disabled={!count || submitting || envioIncompleto} className="btn-primary w-full py-3.5 text-sm uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed">
             {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Receipt className="w-4 h-4" />}
             {submitting ? "Registrando…" : "Cobrar venta"}
           </button>

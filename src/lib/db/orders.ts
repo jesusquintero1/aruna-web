@@ -14,7 +14,9 @@ export interface CreateOrderInput {
     nombre?: string | null;
     telefono?: string | null;
     email?: string | null;
+    cedula?: string | null;
     ciudad?: string | null;
+    departamento?: string | null;
     direccion?: string | null;
   };
   notas?: string | null;
@@ -39,7 +41,9 @@ export interface Order {
   cliente_nombre: string | null;
   cliente_telefono: string | null;
   cliente_email: string | null;
+  cliente_cedula: string | null;
   cliente_ciudad: string | null;
+  cliente_departamento: string | null;
   cliente_direccion: string | null;
   notas: string | null;
   created_at: string;
@@ -76,7 +80,9 @@ export async function createOrder(input: CreateOrderInput): Promise<{ id: string
     p_cliente_nombre: input.cliente?.nombre ?? null,
     p_cliente_telefono: input.cliente?.telefono ?? null,
     p_cliente_email: input.cliente?.email ?? null,
+    p_cliente_cedula: input.cliente?.cedula ?? null,
     p_cliente_ciudad: input.cliente?.ciudad ?? null,
+    p_cliente_departamento: input.cliente?.departamento ?? null,
     p_cliente_direccion: input.cliente?.direccion ?? null,
     p_notas: input.notas ?? null,
     p_items: input.items,

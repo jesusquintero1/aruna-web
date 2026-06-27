@@ -66,7 +66,9 @@ create table if not exists orders (
   cliente_nombre text,
   cliente_telefono text,
   cliente_email text,
+  cliente_cedula text,
   cliente_ciudad text,
+  cliente_departamento text,
   cliente_direccion text,
   notas text,
   pago_referencia text,                      -- referencia de la pasarela (Wompi)
@@ -108,7 +110,9 @@ create or replace function create_order(
   p_cliente_nombre text,
   p_cliente_telefono text,
   p_cliente_email text,
+  p_cliente_cedula text,
   p_cliente_ciudad text,
+  p_cliente_departamento text,
   p_cliente_direccion text,
   p_notas text,
   p_items jsonb
@@ -143,12 +147,12 @@ begin
   -- Insertar el pedido
   insert into orders (
     id, channel, estado, metodo_pago, subtotal, total,
-    cliente_nombre, cliente_telefono, cliente_email,
-    cliente_ciudad, cliente_direccion, notas
+    cliente_nombre, cliente_telefono, cliente_email, cliente_cedula,
+    cliente_ciudad, cliente_departamento, cliente_direccion, notas
   ) values (
     p_id, p_channel, p_estado, p_metodo_pago, v_subtotal, v_subtotal,
-    p_cliente_nombre, p_cliente_telefono, p_cliente_email,
-    p_cliente_ciudad, p_cliente_direccion, p_notas
+    p_cliente_nombre, p_cliente_telefono, p_cliente_email, p_cliente_cedula,
+    p_cliente_ciudad, p_cliente_departamento, p_cliente_direccion, p_notas
   );
 
   -- Insertar ítems + descontar stock

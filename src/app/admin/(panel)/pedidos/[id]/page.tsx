@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getOrderById } from "@/lib/db/orders";
 import { changeOrderStatus } from "@/lib/db/pos-actions";
 import { formatPrice } from "@/lib/utils";
-import { ArrowLeft, User, Phone, Mail, MapPin } from "lucide-react";
+import { ArrowLeft, User, Phone, Mail, MapPin, CreditCard } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -41,9 +41,10 @@ export default async function PedidoDetalle({ params }: { params: Promise<{ id: 
         <div className="bg-white border border-cream-dark rounded-2xl p-5 space-y-3">
           <h2 className="font-title font-extrabold text-chocolate">Cliente</h2>
           <p className="flex items-center gap-2 text-sm text-chocolate"><User className="w-4 h-4 text-caribe" /> {o.cliente_nombre || "—"}</p>
+          <p className="flex items-center gap-2 text-sm text-chocolate"><CreditCard className="w-4 h-4 text-caribe" /> {o.cliente_cedula ? `C.C. ${o.cliente_cedula}` : "—"}</p>
           <p className="flex items-center gap-2 text-sm text-chocolate"><Phone className="w-4 h-4 text-caribe" /> {o.cliente_telefono || "—"}</p>
           <p className="flex items-center gap-2 text-sm text-chocolate"><Mail className="w-4 h-4 text-caribe" /> {o.cliente_email || "—"}</p>
-          <p className="flex items-start gap-2 text-sm text-chocolate"><MapPin className="w-4 h-4 text-caribe flex-shrink-0 mt-0.5" /> {[o.cliente_direccion, o.cliente_ciudad].filter(Boolean).join(", ") || "—"}</p>
+          <p className="flex items-start gap-2 text-sm text-chocolate"><MapPin className="w-4 h-4 text-caribe flex-shrink-0 mt-0.5" /> {[o.cliente_direccion, o.cliente_ciudad, o.cliente_departamento].filter(Boolean).join(", ") || "—"}</p>
         </div>
 
         {/* Pago */}

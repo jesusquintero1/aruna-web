@@ -8,7 +8,14 @@ import { updateOrderStatus, type Order } from "@/lib/db/orders";
 export interface PosSaleInput {
   items: OrderItemInput[];
   metodoPago: string;
-  cliente?: { nombre?: string; telefono?: string };
+  cliente?: {
+    nombre?: string;
+    telefono?: string;
+    cedula?: string;
+    direccion?: string;
+    ciudad?: string;
+    departamento?: string;
+  };
   notas?: string;
 }
 
@@ -27,7 +34,14 @@ export async function createPosSale(input: PosSaleInput): Promise<PosSaleResult>
       channel: "pos",
       estado: "pagado",
       metodoPago: input.metodoPago,
-      cliente: { nombre: input.cliente?.nombre, telefono: input.cliente?.telefono },
+      cliente: {
+        nombre: input.cliente?.nombre,
+        telefono: input.cliente?.telefono,
+        cedula: input.cliente?.cedula,
+        direccion: input.cliente?.direccion,
+        ciudad: input.cliente?.ciudad,
+        departamento: input.cliente?.departamento,
+      },
       notas: input.notas,
       items: input.items,
     });
