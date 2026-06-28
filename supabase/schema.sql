@@ -450,6 +450,8 @@ declare
   v_qty int;
   v_costo int;
   v_venta int;
+  v_is_new boolean;
+  v_exists boolean;
 begin
   if not exists (select 1 from purchase_orders where id = p_id) then
     raise exception 'COMPRA_NO_EXISTE:%', p_id;
@@ -477,16 +479,36 @@ begin
     v_qty   := coalesce((v_item->>'cantidad')::int, 0);
     v_costo := coalesce((v_item->>'costo_unitario')::int, 0);
     v_venta := coalesce((v_item->>'precio_venta')::int, 0);
+    v_is_new := coalesce((v_item->>'is_new')::boolean, false);
 
     if v_pid is null or v_pid = '' or v_qty <= 0 then
       continue;
     end if;
 
-    update products
-      set stock = stock + v_qty,
-          costo = v_costo,
-          precio = v_venta
-    where id = v_pid;
+    select exists(select 1 from products where id = v_pid) into v_exists;
+
+    if v_is_new and not v_exists then
+      insert into products (id, nombre, descripcion, precio, costo, simbolo, categoria_id, destacado, stock, imagenes, colores)
+      values (
+        v_pid,
+        coalesce(v_item->>'nombre', 'Mochila'),
+        coalesce(v_item->>'descripcion', ''),
+        v_venta,
+        v_costo,
+        coalesce(v_item->>'simbolo', 'cardenal'),
+        nullif(v_item->>'categoria_id', '')::uuid,
+        coalesce((v_item->>'destacado')::boolean, false),
+        v_qty,
+        '{}',
+        '{}'
+      );
+    else
+      update products
+        set stock = stock + v_qty,
+            costo = v_costo,
+            precio = v_venta
+      where id = v_pid;
+    end if;
 
     insert into purchase_items (purchase_order_id, product_id, referencia, cantidad, costo_unitario, precio_venta)
     values (p_id, v_pid, nullif(v_item->>'referencia', ''), v_qty, v_costo, v_venta);
