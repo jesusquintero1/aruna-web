@@ -9,8 +9,6 @@ import Image from "next/image";
 
 type View = "cart" | "checkout" | "success";
 
-const paymentMethods = ["Nequi", "Daviplata", "Bancolombia", "Tarjeta", "Contra entrega"];
-
 export default function CartDrawer() {
   const {
     cart, isCartOpen, setIsCartOpen, updateQuantity, removeFromCart,
@@ -23,7 +21,7 @@ export default function CartDrawer() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [form, setForm] = useState({
-    nombre: "", telefono: "", email: "", ciudad: "", direccion: "", pago: "Nequi",
+    nombre: "", telefono: "", email: "", ciudad: "", direccion: "",
   });
 
   useEffect(() => {
@@ -59,12 +57,11 @@ export default function CartDrawer() {
     setSubmitting(true);
     setError("");
     try {
-      const res = await fetch("/api/orders", {
+      const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           items: cart.map((i) => ({ product_id: i.product.id, cantidad: i.quantity })),
-          metodoPago: form.pago,
           cliente: {
             nombre: form.nombre,
             telefono: form.telefono,
@@ -76,7 +73,15 @@ export default function CartDrawer() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "No se pudo procesar el pedido.");
-      setOrderId(data.id);
+
+      if (data.init_point) {
+        // Redirigir a Mercado Pago (el carrito se conserva hasta confirmar el pago).
+        window.location.href = data.init_point;
+        return;
+      }
+
+      // Respaldo (Mercado Pago no configurado): pedido manual.
+      setOrderId(data.orderId);
       clearCart();
       setView("success");
     } catch (err) {
@@ -225,11 +230,12 @@ export default function CartDrawer() {
                   <Field label="Ciudad *" value={form.ciudad} onChange={set("ciudad")} placeholder="Ej. Bogotá" />
                   <Field label="Dirección de entrega *" value={form.direccion} onChange={set("direccion")} placeholder="Calle, número, barrio, apto" />
 
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-black uppercase tracking-wide text-chocolate">Método de pago</label>
-                    <select value={form.pago} onChange={set("pago")} className="w-full bg-white border border-cream-dark rounded-xl px-4 py-3 text-sm text-chocolate font-semibold focus:outline-none focus:border-caribe">
-                      {paymentMethods.map((m) => <option key={m} value={m}>{m}</option>)}
-                    </select>
+                  <div className="bg-white border border-cream-dark rounded-2xl p-3 flex items-start gap-2.5">
+                    <Lock className="w-4 h-4 text-cactus flex-shrink-0 mt-0.5" />
+                    <p className="text-xs text-chocolate-light">
+                      Pagas de forma segura con <b className="text-chocolate">Mercado Pago</b> en el siguiente paso:
+                      tarjeta, PSE, Nequi y más. Tus datos quedan protegidos.
+                    </p>
                   </div>
 
                   {/* Resumen del pedido */}
@@ -253,10 +259,10 @@ export default function CartDrawer() {
                     <p className="text-sm text-flamenco font-semibold text-center bg-flamenco-light rounded-xl py-2">{error}</p>
                   )}
                   <button type="submit" disabled={!formValid || submitting} className="btn-primary w-full py-4 text-sm uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed disabled:translate-y-0">
-                    {submitting ? "Procesando…" : `Confirmar pedido · ${formatPrice(cartTotal)}`}
+                    {submitting ? "Redirigiendo a Mercado Pago…" : `Pagar · ${formatPrice(cartTotal)}`}
                   </button>
                   <p className="flex items-center justify-center gap-1.5 text-[11px] text-chocolate-light font-semibold">
-                    <Lock className="w-3.5 h-3.5" /> Te contactaremos para coordinar el pago
+                    <Lock className="w-3.5 h-3.5" /> Pago protegido con Mercado Pago
                   </p>
                 </div>
               </form>

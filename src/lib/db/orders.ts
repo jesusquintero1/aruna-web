@@ -185,3 +185,21 @@ export async function updateOrderStatus(id: string, estado: Order["estado"]): Pr
   if (!db) return;
   await db.from("orders").update({ estado }).eq("id", id);
 }
+
+/** Marca un pedido como pagado (solo si estaba pendiente). Lo usa el webhook de pago. */
+export async function markOrderPaid(id: string, ref: string | null): Promise<boolean> {
+  const db = getSupabase();
+  if (!db) return false;
+  const { data, error } = await db.rpc("mark_order_paid", { p_id: id, p_ref: ref });
+  if (error) return false;
+  return data === true;
+}
+
+/** Libera un pedido no pagado: repone stock y lo cancela. Lo usa el webhook si el pago falla. */
+export async function releaseOrder(id: string): Promise<boolean> {
+  const db = getSupabase();
+  if (!db) return false;
+  const { data, error } = await db.rpc("release_order", { p_id: id });
+  if (error) return false;
+  return data === true;
+}
