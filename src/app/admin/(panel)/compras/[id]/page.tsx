@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPurchaseOrderById } from "@/lib/db/purchases";
+import { deletePurchaseAction } from "@/lib/db/purchase-actions";
 import { formatPrice } from "@/lib/utils";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Pencil, Trash2 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -23,9 +24,22 @@ export default async function PedidoProveedorDetalle({ params }: { params: Promi
         <ArrowLeft className="w-4 h-4" /> Volver a pedidos
       </Link>
 
-      <div>
-        <h1 className="font-lux font-bold text-3xl text-chocolate">{p.id}</h1>
-        <p className="text-sm text-chocolate-light">{p.proveedor || "Sin proveedor"} · {p.fecha}</p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="font-lux font-bold text-3xl text-chocolate">{p.id}</h1>
+          <p className="text-sm text-chocolate-light">{p.proveedor || "Sin proveedor"} · {p.fecha}</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Link href={`/admin/compras/${p.id}/editar`} className="btn-secondary px-4 py-2 text-xs uppercase tracking-wider inline-flex items-center gap-1.5">
+            <Pencil className="w-3.5 h-3.5" /> Editar
+          </Link>
+          <form action={deletePurchaseAction}>
+            <input type="hidden" name="id" value={p.id} />
+            <button type="submit" className="px-4 py-2 text-xs uppercase tracking-wider font-bold rounded-xl border border-flamenco/40 text-flamenco hover:bg-flamenco/10 inline-flex items-center gap-1.5">
+              <Trash2 className="w-3.5 h-3.5" /> Eliminar
+            </button>
+          </form>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">

@@ -99,6 +99,47 @@ export async function createPurchaseOrder(input: CreatePurchaseInput): Promise<{
 }
 
 // ============================================================
+// Editar / eliminar pedido de proveedor
+// ============================================================
+export interface UpdatePurchaseInput {
+  id: string;
+  proveedor?: string | null;
+  fecha?: string | null;
+  costoEnvio?: number;
+  notas?: string | null;
+  items: PurchaseItemInput[];
+}
+
+/** Edita un lote de compra (revierte stock anterior y reaplica los ítems). */
+export async function updatePurchaseOrder(input: UpdatePurchaseInput): Promise<{ id: string }> {
+  const items = (input.items || []).filter((i) => i.product_id && i.cantidad > 0);
+  if (!items.length) throw new PurchaseError("Agrega al menos una referencia con cantidad.");
+
+  const db = getSupabase();
+  if (!db) return { id: input.id };
+
+  const { data, error } = await db.rpc("update_purchase_order", {
+    p_id: input.id,
+    p_proveedor: input.proveedor ?? null,
+    p_fecha: input.fecha || null,
+    p_costo_envio: input.costoEnvio ?? 0,
+    p_notas: input.notas ?? null,
+    p_items: items,
+  });
+
+  if (error) throw new PurchaseError(error.message || "No se pudo actualizar el pedido.");
+  return { id: (data as string) ?? input.id };
+}
+
+/** Elimina un lote de compra y resta del stock las unidades compradas. */
+export async function deletePurchaseOrder(id: string): Promise<void> {
+  const db = getSupabase();
+  if (!db) return;
+  const { error } = await db.rpc("delete_purchase_order", { p_id: id });
+  if (error) throw new PurchaseError(error.message || "No se pudo eliminar el pedido.");
+}
+
+// ============================================================
 // Lecturas
 // ============================================================
 export async function getPurchaseOrders(): Promise<PurchaseOrder[]> {

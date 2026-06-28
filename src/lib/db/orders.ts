@@ -4,22 +4,38 @@ import { getSupabase } from "@/lib/supabase/server";
 export interface OrderItemInput {
   product_id: string;
   cantidad: number;
+  /** Precio unitario final (override del POS). Si se omite o es <= 0 se usa el de la DB. */
+  precio_unitario?: number;
+}
+
+export interface OrderCliente {
+  nombre?: string | null;
+  telefono?: string | null;
+  email?: string | null;
+  cedula?: string | null;
+  ciudad?: string | null;
+  departamento?: string | null;
+  direccion?: string | null;
 }
 
 export interface CreateOrderInput {
   channel: "online" | "pos";
   estado: "pendiente" | "pagado" | "enviado" | "cancelado";
   metodoPago?: string | null;
-  cliente?: {
-    nombre?: string | null;
-    telefono?: string | null;
-    email?: string | null;
-    cedula?: string | null;
-    ciudad?: string | null;
-    departamento?: string | null;
-    direccion?: string | null;
-  };
+  cliente?: OrderCliente;
   notas?: string | null;
+  /** Descuento global sobre el subtotal (en COP). */
+  descuento?: number;
+  items: OrderItemInput[];
+}
+
+export interface UpdateOrderInput {
+  id: string;
+  estado: "pendiente" | "pagado" | "enviado" | "cancelado";
+  metodoPago?: string | null;
+  cliente?: OrderCliente;
+  notas?: string | null;
+  descuento?: number;
   items: OrderItemInput[];
 }
 
@@ -38,6 +54,7 @@ export interface Order {
   metodo_pago: string | null;
   subtotal: number;
   total: number;
+  descuento: number;
   cliente_nombre: string | null;
   cliente_telefono: string | null;
   cliente_email: string | null;
@@ -86,21 +103,62 @@ export async function createOrder(input: CreateOrderInput): Promise<{ id: string
     p_cliente_direccion: input.cliente?.direccion ?? null,
     p_notas: input.notas ?? null,
     p_items: input.items,
+    p_descuento: Math.max(0, Math.round(input.descuento ?? 0)),
   });
 
-  if (error) {
-    const msg = error.message || "";
-    if (msg.includes("SIN_STOCK")) {
-      const nombre = msg.split("SIN_STOCK:")[1]?.trim() || "una pieza";
-      throw new OrderError(`Lo sentimos, "${nombre}" acaba de agotarse.`);
-    }
-    if (msg.includes("PRODUCTO_NO_EXISTE")) {
-      throw new OrderError("Uno de los productos ya no está disponible.");
-    }
-    throw new OrderError("No se pudo procesar el pedido. Intenta de nuevo.");
-  }
+  if (error) throw mapOrderError(error.message);
 
   return { id: (data as string) ?? id };
+}
+
+/** Traduce errores del RPC a mensajes de negocio legibles. */
+function mapOrderError(message: string | undefined): OrderError {
+  const msg = message || "";
+  if (msg.includes("SIN_STOCK")) {
+    const nombre = msg.split("SIN_STOCK:")[1]?.trim() || "una pieza";
+    return new OrderError(`Lo sentimos, "${nombre}" acaba de agotarse.`);
+  }
+  if (msg.includes("PRODUCTO_NO_EXISTE")) {
+    return new OrderError("Uno de los productos ya no está disponible.");
+  }
+  if (msg.includes("PEDIDO_NO_EXISTE")) {
+    return new OrderError("El pedido ya no existe.");
+  }
+  return new OrderError("No se pudo procesar el pedido. Intenta de nuevo.");
+}
+
+/** Edición completa de un pedido (incluye ítems; repone y vuelve a descontar stock). */
+export async function updateOrderFull(input: UpdateOrderInput): Promise<{ id: string }> {
+  if (!input.items?.length) throw new OrderError("El pedido debe tener al menos un producto.");
+  const db = getSupabase();
+  if (!db) return { id: input.id };
+
+  const { data, error } = await db.rpc("update_order", {
+    p_id: input.id,
+    p_estado: input.estado,
+    p_metodo_pago: input.metodoPago ?? null,
+    p_cliente_nombre: input.cliente?.nombre ?? null,
+    p_cliente_telefono: input.cliente?.telefono ?? null,
+    p_cliente_email: input.cliente?.email ?? null,
+    p_cliente_cedula: input.cliente?.cedula ?? null,
+    p_cliente_ciudad: input.cliente?.ciudad ?? null,
+    p_cliente_departamento: input.cliente?.departamento ?? null,
+    p_cliente_direccion: input.cliente?.direccion ?? null,
+    p_notas: input.notas ?? null,
+    p_items: input.items,
+    p_descuento: Math.max(0, Math.round(input.descuento ?? 0)),
+  });
+
+  if (error) throw mapOrderError(error.message);
+  return { id: (data as string) ?? input.id };
+}
+
+/** Elimina un pedido y devuelve el stock al inventario. */
+export async function deleteOrder(id: string): Promise<void> {
+  const db = getSupabase();
+  if (!db) return;
+  const { error } = await db.rpc("delete_order", { p_id: id });
+  if (error) throw mapOrderError(error.message);
 }
 
 /** Lista de pedidos (admin). */
