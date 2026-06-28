@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getSupabase } from "@/lib/supabase/server";
 import { verifySession } from "@/lib/auth/session";
+import { productSchema } from "@/lib/validation/schemas";
 
 function slugify(s: string): string {
   return s
@@ -65,6 +66,13 @@ export async function saveProduct(formData: FormData): Promise<void> {
   const simbolo = String(formData.get("simbolo") || "cardenal");
   const categoria_id = String(formData.get("categoria_id") || "") || null;
   const descripcion = String(formData.get("descripcion") || "");
+
+  // Validación de forma y topes (precios/stock/símbolo).
+  const v = productSchema.safeParse({ nombre, precio, costo, precio_anterior, stock, simbolo });
+  if (!v.success) {
+    const msg = v.error.issues[0]?.message || "Datos del producto inválidos.";
+    throw new Error(msg);
+  }
 
   // Imágenes existentes que se conservan + nuevas subidas
   const keep = formData.getAll("keep_imagenes").map(String).filter(Boolean);

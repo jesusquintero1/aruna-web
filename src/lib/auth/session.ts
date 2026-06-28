@@ -8,7 +8,18 @@ const COOKIE = "aruna_admin";
 const MAX_AGE = 60 * 60 * 24 * 7; // 7 días
 
 function getSecret(): Uint8Array {
-  const s = process.env.AUTH_SECRET || "dev-insecure-secret-cambia-esto-en-produccion";
+  const s = process.env.AUTH_SECRET;
+  if (!s) {
+    // En producción NUNCA usamos un secreto por defecto: sin AUTH_SECRET cualquiera
+    // podría forjar una sesión de admin. Se valida de forma diferida (en el primer
+    // uso, no al importar el módulo) para no romper el build/prerender de Netlify.
+    if (process.env.NODE_ENV === "production") {
+      throw new Error(
+        "AUTH_SECRET no está configurado. Define la variable de entorno antes de desplegar."
+      );
+    }
+    return new TextEncoder().encode("dev-insecure-secret-cambia-esto-en-produccion");
+  }
   return new TextEncoder().encode(s);
 }
 

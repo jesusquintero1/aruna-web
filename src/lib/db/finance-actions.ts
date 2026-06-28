@@ -3,9 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getSupabase } from "@/lib/supabase/server";
 import { verifySession } from "@/lib/auth/session";
-import type { MovimientoTipo } from "@/lib/db/finance";
-
-const TIPOS: MovimientoTipo[] = ["inversion", "gasto", "ingreso"];
+import { movementSchema } from "@/lib/validation/schemas";
 
 /** Registra un movimiento financiero (inversión, gasto o ingreso). */
 export async function createMovementAction(formData: FormData): Promise<void> {
@@ -14,14 +12,18 @@ export async function createMovementAction(formData: FormData): Promise<void> {
   if (!db) throw new Error("Supabase no está configurado.");
 
   const tipoRaw = String(formData.get("tipo") || "");
-  const tipo = (TIPOS.includes(tipoRaw as MovimientoTipo) ? tipoRaw : "gasto") as MovimientoTipo;
-  const asunto = String(formData.get("asunto") || "").trim();
-  const descripcion = String(formData.get("descripcion") || "").trim() || null;
-  const monto = parseInt(String(formData.get("monto") || "0"), 10) || 0;
-  const fecha = String(formData.get("fecha") || "").trim() || null;
-
-  if (!asunto) throw new Error("El asunto es obligatorio.");
-  if (monto <= 0) throw new Error("El monto debe ser mayor a cero.");
+  const v = movementSchema.safeParse({
+    tipo: ["inversion", "gasto", "ingreso"].includes(tipoRaw) ? tipoRaw : "gasto",
+    asunto: String(formData.get("asunto") || ""),
+    descripcion: String(formData.get("descripcion") || "") || null,
+    monto: parseInt(String(formData.get("monto") || "0"), 10) || 0,
+    fecha: String(formData.get("fecha") || "").trim() || null,
+  });
+  if (!v.success) {
+    const msg = v.error.issues[0]?.message || "Datos del movimiento inválidos.";
+    throw new Error(msg);
+  }
+  const { tipo, asunto, descripcion, monto, fecha } = v.data;
 
   const { error } = await db.from("finance_movements").insert({
     tipo, asunto, descripcion, monto, ...(fecha ? { fecha } : {}),
