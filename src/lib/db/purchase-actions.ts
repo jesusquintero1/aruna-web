@@ -32,6 +32,34 @@ function toInt(v: unknown): number {
 }
 
 /**
+ * Normaliza los ítems del formulario (crear o editar). Las referencias nuevas
+ * (sin product_id) reciben un id legible derivado del nombre; el RPC las inserta
+ * como producto nuevo. Se descartan líneas sin cantidad y las nuevas sin nombre.
+ */
+function mapPurchaseItems(raw: RawItem[]): PurchaseItemInput[] {
+  return (raw || [])
+    .map((it) => {
+      const isNew = Boolean(it.is_new) || !it.product_id;
+      const nombre = (it.nombre || "").trim();
+      const product_id = isNew
+        ? `${slugify(nombre) || "mochila"}-${Math.random().toString(36).slice(2, 6)}`
+        : String(it.product_id);
+      return {
+        product_id,
+        is_new: isNew,
+        nombre: nombre || undefined,
+        referencia: (it.referencia || "").trim() || undefined,
+        cantidad: toInt(it.cantidad),
+        costo_unitario: toInt(it.costo_unitario),
+        precio_venta: toInt(it.precio_venta),
+        categoria_id: it.categoria_id || null,
+        simbolo: it.simbolo || "cardenal",
+      } as PurchaseItemInput;
+    })
+    .filter((it) => it.cantidad > 0 && (!it.is_new || it.nombre));
+}
+
+/**
  * Crea un pedido de proveedor. El cliente envía en el campo `payload` un JSON:
  * { proveedor, fecha, costoEnvio, notas, items: [...] }
  */
@@ -55,26 +83,7 @@ export async function createPurchaseAction(formData: FormData): Promise<void> {
     throw new Error("Datos del pedido inválidos o fuera de rango.");
   }
 
-  const items: PurchaseItemInput[] = (payload.items || [])
-    .map((it) => {
-      const isNew = Boolean(it.is_new) || !it.product_id;
-      const nombre = (it.nombre || "").trim();
-      const product_id = isNew
-        ? `${slugify(nombre) || "mochila"}-${Math.random().toString(36).slice(2, 6)}`
-        : String(it.product_id);
-      return {
-        product_id,
-        is_new: isNew,
-        nombre: nombre || undefined,
-        referencia: (it.referencia || "").trim() || undefined,
-        cantidad: toInt(it.cantidad),
-        costo_unitario: toInt(it.costo_unitario),
-        precio_venta: toInt(it.precio_venta),
-        categoria_id: it.categoria_id || null,
-        simbolo: it.simbolo || "cardenal",
-      } as PurchaseItemInput;
-    })
-    .filter((it) => it.cantidad > 0 && (!it.is_new || it.nombre));
+  const items = mapPurchaseItems(payload.items || []);
 
   if (!items.length) throw new Error("Agrega al menos una referencia con nombre y cantidad.");
 
@@ -127,19 +136,12 @@ export async function updatePurchaseAction(formData: FormData): Promise<void> {
     throw new Error("Datos del pedido inválidos o fuera de rango.");
   }
 
-  const items: PurchaseItemInput[] = (payload.items || [])
-    .filter((it) => it.product_id) // edición: solo referencias existentes
-    .map((it) => ({
-      product_id: String(it.product_id),
-      is_new: false,
-      referencia: (it.referencia || "").trim() || undefined,
-      cantidad: toInt(it.cantidad),
-      costo_unitario: toInt(it.costo_unitario),
-      precio_venta: toInt(it.precio_venta),
-    }))
-    .filter((it) => it.cantidad > 0);
+  // Edición: igual que crear. Las referencias nuevas (sin product_id) se insertan
+  // como producto nuevo; las existentes acumulan stock. El RPC update_purchase_order
+  // revierte el stock anterior del pedido y reaplica estas líneas.
+  const items = mapPurchaseItems(payload.items || []);
 
-  if (!items.length) throw new Error("Agrega al menos una referencia existente con cantidad.");
+  if (!items.length) throw new Error("Agrega al menos una referencia con cantidad.");
 
   await updatePurchaseOrder({
     id,

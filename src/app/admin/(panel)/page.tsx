@@ -18,7 +18,9 @@ export default async function AdminDashboard() {
   ]);
   const configured = isSupabaseConfigured();
 
-  const disponibles = productos.filter((p) => p.stock > 0).length;
+  // Unidades disponibles = suma del stock de todas las referencias (NO el número
+  // de productos/categorías). Una referencia con 5 unidades cuenta como 5.
+  const unidadesDisponibles = productos.reduce((s, p) => s + Math.max(0, p.stock), 0);
   const stockBajo = productos.filter((p) => p.stock > 0 && p.stock <= 1);
   const recientes = pedidos.slice(0, 5);
 
@@ -35,7 +37,7 @@ export default async function AdminDashboard() {
 
   const opStats = [
     { label: "Productos", value: productos.length, icon: Package, color: "text-caribe" },
-    { label: "Disponibles", value: disponibles, icon: TrendingUp, color: "text-cactus" },
+    { label: "Unidades en stock", value: unidadesDisponibles, icon: Boxes, color: "text-cactus" },
     { label: "Pedidos", value: pedidos.length, icon: ShoppingBag, color: "text-flamenco" },
     { label: "Ventas pagadas", value: formatPrice(fin.ventasPagadas), icon: Coins, color: "text-gold-deep" },
   ];

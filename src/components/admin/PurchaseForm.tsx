@@ -125,18 +125,24 @@ export default function PurchaseForm({ productos, initial }: { productos: Produc
       <Link href="/admin/compras" className="inline-flex items-center gap-2 text-sm font-bold text-chocolate-light hover:text-caribe">
         <ArrowLeft className="w-4 h-4" /> Volver a pedidos
       </Link>
-      <h1 className="font-lux font-bold text-3xl text-chocolate">
-        {editing ? `Editar pedido ${initial!.id}` : "Nuevo pedido de proveedor"}
-      </h1>
-      <p className="text-sm text-chocolate-light -mt-3">
-        {editing
-          ? "Al guardar se revierte el stock anterior de este pedido y se aplican las nuevas cantidades. En edición solo puedes ajustar referencias existentes (para nuevas, usa “Nuevo pedido”)."
-          : "Carga varias mochilas de un mismo pedido. Cada línea suma stock; si eliges una referencia existente, las unidades se acumulan a ese producto."}
-      </p>
-
       <form action={editing ? updatePurchaseAction : createPurchaseAction} className="space-y-6">
         {editing && <input type="hidden" name="id" value={initial!.id} />}
         <input type="hidden" name="payload" value={payload} />
+
+        {/* Cabecera: título + botón de guardar ARRIBA (para no tener que bajar al final) */}
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="font-lux font-bold text-3xl text-chocolate">
+              {editing ? `Editar pedido ${initial!.id}` : "Nuevo pedido de proveedor"}
+            </h1>
+            <p className="text-sm text-chocolate-light mt-1 max-w-2xl">
+              {editing
+                ? "Al guardar se revierte el stock anterior de este pedido y se reaplican las cantidades. Puedes ajustar referencias existentes o agregar mochilas nuevas."
+                : "Carga varias mochilas de un mismo pedido. Cada línea suma stock; si eliges una referencia existente, las unidades se acumulan a ese producto."}
+            </p>
+          </div>
+          <SubmitBtn disabled={!valido} label={editing ? "Guardar cambios" : "Guardar pedido"} />
+        </div>
 
         {/* Cabecera */}
         <div className="grid sm:grid-cols-4 gap-4 bg-white border border-cream-dark rounded-2xl p-6">
@@ -170,8 +176,7 @@ export default function PurchaseForm({ productos, initial }: { productos: Produc
             <div key={r.key} className="grid grid-cols-1 lg:grid-cols-[2fr_1fr_0.7fr_1fr_1fr_auto] gap-3 items-start border-b border-cream-dark/60 lg:border-0 pb-3 lg:pb-0">
               <div className="space-y-2">
                 <select value={r.product_id} onChange={(e) => onSelectProduct(r.key, e.target.value)} className={field}>
-                  {!editing && <option value="">➕ Nueva referencia…</option>}
-                  {editing && <option value="">— Selecciona referencia —</option>}
+                  <option value="">➕ Nueva referencia…</option>
                   {productos.map((p) => (
                     <option key={p.id} value={p.id}>{p.nombre}</option>
                   ))}
