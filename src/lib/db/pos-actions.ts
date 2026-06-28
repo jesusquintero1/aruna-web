@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { verifySession } from "@/lib/auth/session";
 import { createOrder, OrderError, type OrderItemInput } from "@/lib/db/orders";
 import { updateOrderStatus, updateOrderFull, deleteOrder, type Order } from "@/lib/db/orders";
+import { posSaleSchema, orderEditSchema } from "@/lib/validation/schemas";
 
 export interface PosSaleInput {
   items: OrderItemInput[];
@@ -32,7 +33,8 @@ export interface PosSaleResult {
 export async function createPosSale(input: PosSaleInput): Promise<PosSaleResult> {
   await verifySession();
   try {
-    if (!input.items?.length) return { ok: false, error: "Agrega al menos un producto." };
+    const v = posSaleSchema.safeParse(input);
+    if (!v.success) return { ok: false, error: "Datos de la venta inválidos." };
     const { id } = await createOrder({
       channel: "pos",
       estado: "pagado",
@@ -112,7 +114,8 @@ export interface OrderEditInput {
 export async function updateOrderAction(input: OrderEditInput): Promise<PosSaleResult> {
   await verifySession();
   try {
-    if (!input.items?.length) return { ok: false, error: "El pedido debe tener al menos un producto." };
+    const v = orderEditSchema.safeParse(input);
+    if (!v.success) return { ok: false, error: "Datos del pedido inválidos." };
     const { id } = await updateOrderFull({
       id: input.id,
       estado: input.estado,

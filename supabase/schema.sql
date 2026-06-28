@@ -504,10 +504,18 @@ values ('product-images', 'product-images', true)
 on conflict (id) do nothing;
 
 -- ============================================================
--- NOTA SOBRE SEGURIDAD (RLS)
--- El servidor de Next.js usa la SERVICE ROLE key (omite RLS).
--- Mantén estas tablas SIN políticas públicas: nunca expongas la
--- anon key con acceso de escritura. (Fase de pulido: activar RLS
--- y políticas de solo-lectura para columnas públicas si se quiere
--- consultar desde el navegador.)
+-- SEGURIDAD (RLS) — ACTIVA
+-- El servidor de Next.js usa la SERVICE ROLE key (omite RLS) para TODO el
+-- acceso; la app nunca usa la anon key ni un cliente de navegador.
+-- RLS está activado en todas las tablas SIN políticas públicas (deny-all
+-- para anon/authenticated) como defensa en profundidad. Para la DB en vivo,
+-- correr supabase/migration-rls.sql y supabase/migration-rate-limit.sql.
 -- ============================================================
+alter table products          enable row level security;
+alter table categories        enable row level security;
+alter table admin_users       enable row level security;
+alter table orders            enable row level security;
+alter table order_items       enable row level security;
+alter table purchase_orders   enable row level security;
+alter table purchase_items    enable row level security;
+alter table finance_movements enable row level security;

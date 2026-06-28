@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { verifySession } from "@/lib/auth/session";
 import { createPurchaseOrder, updatePurchaseOrder, deletePurchaseOrder, type PurchaseItemInput } from "@/lib/db/purchases";
+import { purchasePayloadSchema } from "@/lib/validation/schemas";
 
 function slugify(s: string): string {
   return s
@@ -48,6 +49,10 @@ export async function createPurchaseAction(formData: FormData): Promise<void> {
     payload = JSON.parse(String(formData.get("payload") || "{}"));
   } catch {
     throw new Error("Datos del pedido inválidos.");
+  }
+
+  if (!purchasePayloadSchema.safeParse(payload).success) {
+    throw new Error("Datos del pedido inválidos o fuera de rango.");
   }
 
   const items: PurchaseItemInput[] = (payload.items || [])
@@ -116,6 +121,10 @@ export async function updatePurchaseAction(formData: FormData): Promise<void> {
     payload = JSON.parse(String(formData.get("payload") || "{}"));
   } catch {
     throw new Error("Datos del pedido inválidos.");
+  }
+
+  if (!purchasePayloadSchema.safeParse(payload).success) {
+    throw new Error("Datos del pedido inválidos o fuera de rango.");
   }
 
   const items: PurchaseItemInput[] = (payload.items || [])
