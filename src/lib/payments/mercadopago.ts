@@ -69,6 +69,7 @@ export interface PaymentInfo {
   id: string;
   status: string; // approved | rejected | pending | in_process | cancelled | refunded ...
   external_reference: string | null;
+  payer_email: string | null;
 }
 
 /** Consulta un pago por id (lo usa el webhook para conocer su estado real). */
@@ -82,6 +83,7 @@ export async function getPayment(paymentId: string): Promise<PaymentInfo | null>
       id: String(p.id),
       status: String(p.status ?? "pending"),
       external_reference: p.external_reference ?? null,
+      payer_email: p.payer?.email ?? null,
     };
   } catch {
     return null;

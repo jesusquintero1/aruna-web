@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPayment, verifyWebhookSignature } from "@/lib/payments/mercadopago";
-import { markOrderPaid, releaseOrder } from "@/lib/db/orders";
+import { markOrderPaid, releaseOrder, getOrderById } from "@/lib/db/orders";
+import { sendPaidOrderEmails } from "@/lib/email/send";
 import { revalidatePath } from "next/cache";
 
 /**
@@ -51,7 +52,12 @@ export async function POST(req: NextRequest) {
 
     const orderId = payment.external_reference;
     if (payment.status === "approved") {
-      await markOrderPaid(orderId, payment.id);
+      const cambioApagado = await markOrderPaid(orderId, payment.id);
+      // Enviar correos solo en la PRIMERA transición a pagado (evita duplicados en reintentos).
+      if (cambioApagado) {
+        const order = await getOrderById(orderId);
+        if (order) await sendPaidOrderEmails(order, payment.payer_email);
+      }
     } else if (payment.status === "rejected" || payment.status === "cancelled") {
       await releaseOrder(orderId);
     }
