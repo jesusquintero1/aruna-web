@@ -203,3 +203,19 @@ export async function releaseOrder(id: string): Promise<boolean> {
   if (error) return false;
   return data === true;
 }
+
+/**
+ * Expira carritos abandonados: cancela y repone el stock de los pedidos ONLINE
+ * 'pendiente' creados hace más de `minutes` minutos. Devuelve cuántos expiró.
+ * Lo invoca el cron (pg_cron en Supabase y/o el endpoint /api/cron/expire-orders).
+ */
+export async function expirePendingOrders(minutes = 60): Promise<number> {
+  const db = getSupabase();
+  if (!db) return 0;
+  const { data, error } = await db.rpc("expire_pending_orders", { p_minutes: minutes });
+  if (error) {
+    console.error("expire_pending_orders falló:", error.message);
+    return 0;
+  }
+  return typeof data === "number" ? data : 0;
+}
