@@ -10,7 +10,7 @@ export const siteConfig = {
   name: "ARÜNA",
   tagline: "Mochilas Wayuu Auténticas · Tejidas con el Alma de La Guajira",
   description: "Boutique premium de mochilas Wayuu 100% tejidas a mano en La Guajira, Colombia. Comercio justo, piezas únicas con alma y tradición ancestral.",
-  url: "https://aruna-wayuu.vercel.app", // Cambiar al dominio real una vez desplegado
+  url: "https://aruna-wayuu.netlify.app", // Dominio de producción (Netlify)
   
   // CONFIGURACIÓN DE CONTACTO Y VENTAS
   contact: {
