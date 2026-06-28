@@ -63,6 +63,7 @@ create table if not exists orders (
   metodo_pago text,
   subtotal int not null default 0,
   total int not null default 0,
+  descuento int not null default 0,        -- descuento global aplicado en POS
   cliente_nombre text,
   cliente_telefono text,
   cliente_email text,
@@ -98,9 +99,11 @@ create index if not exists order_items_order_idx on order_items(order_id);
 --   Valida stock, inserta order + items y descuenta stock,
 --   todo en una sola transacción (evita vender 2 veces la
 --   última unidad). La usan checkout online y POS.
---   Los precios se toman de la DB (no se confía en el cliente).
+--   Los precios se toman de la DB salvo override del POS (precio_unitario).
 --
---   p_items: jsonb array -> [{ "product_id": "...", "cantidad": 1 }, ...]
+--   p_items: jsonb array -> [{ "product_id": "...", "cantidad": 1,
+--                              "precio_unitario": 0 }, ...]
+--   p_descuento: descuento global sobre el subtotal (POS).
 -- ============================================================
 create or replace function create_order(
   p_id text,
@@ -115,7 +118,8 @@ create or replace function create_order(
   p_cliente_departamento text,
   p_cliente_direccion text,
   p_notas text,
-  p_items jsonb
+  p_items jsonb,
+  p_descuento int default 0
 ) returns text
 language plpgsql
 as $$
@@ -123,8 +127,12 @@ declare
   v_item jsonb;
   v_pid text;
   v_qty int;
+  v_override int;
+  v_precio int;
   v_prod products%rowtype;
   v_subtotal int := 0;
+  v_desc int := greatest(0, coalesce(p_descuento, 0));
+  v_total int;
   v_line int;
 begin
   -- Validar y bloquear filas de producto
@@ -132,6 +140,7 @@ begin
   loop
     v_pid := v_item->>'product_id';
     v_qty := coalesce((v_item->>'cantidad')::int, 1);
+    v_override := coalesce((v_item->>'precio_unitario')::int, 0);
 
     select * into v_prod from products where id = v_pid for update;
     if not found then
@@ -141,16 +150,19 @@ begin
       raise exception 'SIN_STOCK:%', v_prod.nombre;
     end if;
 
-    v_subtotal := v_subtotal + (v_prod.precio * v_qty);
+    v_precio := case when v_override > 0 then v_override else v_prod.precio end;
+    v_subtotal := v_subtotal + (v_precio * v_qty);
   end loop;
+
+  v_total := greatest(0, v_subtotal - v_desc);
 
   -- Insertar el pedido
   insert into orders (
-    id, channel, estado, metodo_pago, subtotal, total,
+    id, channel, estado, metodo_pago, subtotal, total, descuento,
     cliente_nombre, cliente_telefono, cliente_email, cliente_cedula,
     cliente_ciudad, cliente_departamento, cliente_direccion, notas
   ) values (
-    p_id, p_channel, p_estado, p_metodo_pago, v_subtotal, v_subtotal,
+    p_id, p_channel, p_estado, p_metodo_pago, v_subtotal, v_total, v_desc,
     p_cliente_nombre, p_cliente_telefono, p_cliente_email, p_cliente_cedula,
     p_cliente_ciudad, p_cliente_departamento, p_cliente_direccion, p_notas
   );
@@ -160,11 +172,132 @@ begin
   loop
     v_pid := v_item->>'product_id';
     v_qty := coalesce((v_item->>'cantidad')::int, 1);
+    v_override := coalesce((v_item->>'precio_unitario')::int, 0);
     select * into v_prod from products where id = v_pid;
-    v_line := v_prod.precio * v_qty;
+    v_precio := case when v_override > 0 then v_override else v_prod.precio end;
+    v_line := v_precio * v_qty;
 
     insert into order_items (order_id, product_id, nombre_snapshot, precio_snapshot, cantidad, subtotal)
-    values (p_id, v_pid, v_prod.nombre, v_prod.precio, v_qty, v_line);
+    values (p_id, v_pid, v_prod.nombre, v_precio, v_qty, v_line);
+
+    update products set stock = stock - v_qty where id = v_pid;
+  end loop;
+
+  return p_id;
+end;
+$$;
+
+-- ============================================================
+-- RPC: delete_order / update_order
+--   Reversión y edición completa de pedidos (ver
+--   supabase/migration-edicion-pos.sql para la DB en vivo).
+-- ============================================================
+create or replace function delete_order(p_id text) returns void
+language plpgsql
+as $$
+declare
+  v_it record;
+begin
+  for v_it in select product_id, cantidad from order_items where order_id = p_id
+  loop
+    if v_it.product_id is not null then
+      update products set stock = stock + v_it.cantidad where id = v_it.product_id;
+    end if;
+  end loop;
+  delete from orders where id = p_id;
+end;
+$$;
+
+create or replace function update_order(
+  p_id text,
+  p_estado text,
+  p_metodo_pago text,
+  p_cliente_nombre text,
+  p_cliente_telefono text,
+  p_cliente_email text,
+  p_cliente_cedula text,
+  p_cliente_ciudad text,
+  p_cliente_departamento text,
+  p_cliente_direccion text,
+  p_notas text,
+  p_items jsonb,
+  p_descuento int default 0
+) returns text
+language plpgsql
+as $$
+declare
+  v_it record;
+  v_item jsonb;
+  v_pid text;
+  v_qty int;
+  v_override int;
+  v_precio int;
+  v_prod products%rowtype;
+  v_subtotal int := 0;
+  v_desc int := greatest(0, coalesce(p_descuento, 0));
+  v_total int;
+  v_line int;
+begin
+  if not exists (select 1 from orders where id = p_id) then
+    raise exception 'PEDIDO_NO_EXISTE:%', p_id;
+  end if;
+
+  for v_it in select product_id, cantidad from order_items where order_id = p_id
+  loop
+    if v_it.product_id is not null then
+      update products set stock = stock + v_it.cantidad where id = v_it.product_id;
+    end if;
+  end loop;
+
+  delete from order_items where order_id = p_id;
+
+  for v_item in select * from jsonb_array_elements(p_items)
+  loop
+    v_pid := v_item->>'product_id';
+    v_qty := coalesce((v_item->>'cantidad')::int, 1);
+    v_override := coalesce((v_item->>'precio_unitario')::int, 0);
+
+    select * into v_prod from products where id = v_pid for update;
+    if not found then
+      raise exception 'PRODUCTO_NO_EXISTE:%', v_pid;
+    end if;
+    if v_prod.stock < v_qty then
+      raise exception 'SIN_STOCK:%', v_prod.nombre;
+    end if;
+
+    v_precio := case when v_override > 0 then v_override else v_prod.precio end;
+    v_subtotal := v_subtotal + (v_precio * v_qty);
+  end loop;
+
+  v_total := greatest(0, v_subtotal - v_desc);
+
+  update orders set
+    estado = p_estado,
+    metodo_pago = p_metodo_pago,
+    subtotal = v_subtotal,
+    total = v_total,
+    descuento = v_desc,
+    cliente_nombre = p_cliente_nombre,
+    cliente_telefono = p_cliente_telefono,
+    cliente_email = p_cliente_email,
+    cliente_cedula = p_cliente_cedula,
+    cliente_ciudad = p_cliente_ciudad,
+    cliente_departamento = p_cliente_departamento,
+    cliente_direccion = p_cliente_direccion,
+    notas = p_notas
+  where id = p_id;
+
+  for v_item in select * from jsonb_array_elements(p_items)
+  loop
+    v_pid := v_item->>'product_id';
+    v_qty := coalesce((v_item->>'cantidad')::int, 1);
+    v_override := coalesce((v_item->>'precio_unitario')::int, 0);
+    select * into v_prod from products where id = v_pid;
+    v_precio := case when v_override > 0 then v_override else v_prod.precio end;
+    v_line := v_precio * v_qty;
+
+    insert into order_items (order_id, product_id, nombre_snapshot, precio_snapshot, cantidad, subtotal)
+    values (p_id, v_pid, v_prod.nombre, v_precio, v_qty, v_line);
 
     update products set stock = stock - v_qty where id = v_pid;
   end loop;
@@ -270,6 +403,90 @@ begin
             precio = v_venta
       where id = v_pid;
     end if;
+
+    insert into purchase_items (purchase_order_id, product_id, referencia, cantidad, costo_unitario, precio_venta)
+    values (p_id, v_pid, nullif(v_item->>'referencia', ''), v_qty, v_costo, v_venta);
+  end loop;
+
+  return p_id;
+end;
+$$;
+
+-- ============================================================
+-- RPC: delete_purchase_order / update_purchase_order
+--   Reversión y edición de lotes de compra (ver
+--   supabase/migration-edicion-pos.sql para la DB en vivo).
+-- ============================================================
+create or replace function delete_purchase_order(p_id text) returns void
+language plpgsql
+as $$
+declare
+  v_it record;
+begin
+  for v_it in select product_id, cantidad from purchase_items where purchase_order_id = p_id
+  loop
+    if v_it.product_id is not null then
+      update products set stock = greatest(0, stock - v_it.cantidad) where id = v_it.product_id;
+    end if;
+  end loop;
+  delete from purchase_orders where id = p_id;
+end;
+$$;
+
+create or replace function update_purchase_order(
+  p_id text,
+  p_proveedor text,
+  p_fecha date,
+  p_costo_envio int,
+  p_notas text,
+  p_items jsonb
+) returns text
+language plpgsql
+as $$
+declare
+  v_it record;
+  v_item jsonb;
+  v_pid text;
+  v_qty int;
+  v_costo int;
+  v_venta int;
+begin
+  if not exists (select 1 from purchase_orders where id = p_id) then
+    raise exception 'COMPRA_NO_EXISTE:%', p_id;
+  end if;
+
+  for v_it in select product_id, cantidad from purchase_items where purchase_order_id = p_id
+  loop
+    if v_it.product_id is not null then
+      update products set stock = greatest(0, stock - v_it.cantidad) where id = v_it.product_id;
+    end if;
+  end loop;
+
+  delete from purchase_items where purchase_order_id = p_id;
+
+  update purchase_orders set
+    proveedor = p_proveedor,
+    fecha = coalesce(p_fecha, current_date),
+    costo_envio = coalesce(p_costo_envio, 0),
+    notas = p_notas
+  where id = p_id;
+
+  for v_item in select * from jsonb_array_elements(p_items)
+  loop
+    v_pid   := v_item->>'product_id';
+    v_qty   := coalesce((v_item->>'cantidad')::int, 0);
+    v_costo := coalesce((v_item->>'costo_unitario')::int, 0);
+    v_venta := coalesce((v_item->>'precio_venta')::int, 0);
+
+    if v_pid is null or v_pid = '' or v_qty <= 0 then
+      continue;
+    end if;
+
+    update products
+      set stock = stock + v_qty,
+          costo = v_costo,
+          precio = v_venta
+    where id = v_pid;
 
     insert into purchase_items (purchase_order_id, product_id, referencia, cantidad, costo_unitario, precio_venta)
     values (p_id, v_pid, nullif(v_item->>'referencia', ''), v_qty, v_costo, v_venta);

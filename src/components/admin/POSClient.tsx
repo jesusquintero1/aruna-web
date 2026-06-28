@@ -19,6 +19,8 @@ const departamentos = [
 
 export default function POSClient({ products }: { products: ProductoAdmin[] }) {
   const [cart, setCart] = useState<Record<string, number>>({});
+  const [precios, setPrecios] = useState<Record<string, number>>({}); // precio final por línea (override)
+  const [descuento, setDescuento] = useState(0); // descuento global en COP
   const [query, setQuery] = useState("");
   const [metodo, setMetodo] = useState("Efectivo");
   const [envio, setEnvio] = useState(false);
@@ -50,8 +52,14 @@ export default function POSClient({ products }: { products: ProductoAdmin[] }) {
     return next;
   });
 
-  const lines = Object.entries(cart).map(([id, qty]) => ({ p: byId[id], qty }));
-  const total = lines.reduce((s, l) => s + l.p.precio * l.qty, 0);
+  const precioDe = (id: string) => (precios[id] ?? byId[id]?.precio ?? 0);
+  const setPrecio = (id: string, v: number) =>
+    setPrecios((p) => ({ ...p, [id]: Math.max(0, Math.round(v) || 0) }));
+
+  const lines = Object.entries(cart).map(([id, qty]) => ({ p: byId[id], qty, precio: precioDe(id) }));
+  const subtotal = lines.reduce((s, l) => s + l.precio * l.qty, 0);
+  const desc = Math.min(Math.max(0, descuento), subtotal); // no más que el subtotal
+  const total = subtotal - desc;
   const count = lines.reduce((s, l) => s + l.qty, 0);
 
   const envioIncompleto =
@@ -70,8 +78,9 @@ export default function POSClient({ products }: { products: ProductoAdmin[] }) {
     }
     setSubmitting(true); setError("");
     const res = await createPosSale({
-      items: lines.map((l) => ({ product_id: l.p.id, cantidad: l.qty })),
+      items: lines.map((l) => ({ product_id: l.p.id, cantidad: l.qty, precio_unitario: l.precio })),
       metodoPago: metodo,
+      descuento: desc,
       cliente: envio
         ? {
             nombre: cliente.trim(),
@@ -87,7 +96,7 @@ export default function POSClient({ products }: { products: ProductoAdmin[] }) {
     setSubmitting(false);
     if (res.ok && res.id) {
       setDoneId(res.id);
-      setCart({}); resetCliente();
+      setCart({}); setPrecios({}); setDescuento(0); resetCliente();
     } else {
       setError(res.error || "No se pudo registrar la venta.");
     }
@@ -150,23 +159,68 @@ export default function POSClient({ products }: { products: ProductoAdmin[] }) {
           {lines.length === 0 ? (
             <p className="text-sm text-chocolate-light py-6 text-center">Toca productos para agregarlos.</p>
           ) : (
-            <div className="space-y-2 max-h-60 overflow-y-auto no-scrollbar">
-              {lines.map((l) => (
-                <div key={l.p.id} className="flex items-center gap-2 text-sm">
-                  <span className="flex-grow truncate text-chocolate font-semibold">{l.p.nombre}</span>
-                  <div className="flex items-center gap-1.5">
-                    <button onClick={() => dec(l.p.id)} className="p-1 text-chocolate-light hover:text-flamenco"><Minus className="w-3.5 h-3.5" /></button>
-                    <span className="font-black text-chocolate w-5 text-center">{l.qty}</span>
-                    <button onClick={() => add(l.p)} disabled={l.qty >= l.p.stock} className="p-1 text-chocolate-light hover:text-caribe disabled:opacity-30"><Plus className="w-3.5 h-3.5" /></button>
+            <div className="space-y-3 max-h-72 overflow-y-auto no-scrollbar">
+              {lines.map((l) => {
+                const editado = l.precio !== l.p.precio;
+                return (
+                  <div key={l.p.id} className="space-y-1.5">
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="flex-grow truncate text-chocolate font-semibold">{l.p.nombre}</span>
+                      <div className="flex items-center gap-1.5">
+                        <button onClick={() => dec(l.p.id)} className="p-1 text-chocolate-light hover:text-flamenco"><Minus className="w-3.5 h-3.5" /></button>
+                        <span className="font-black text-chocolate w-5 text-center">{l.qty}</span>
+                        <button onClick={() => add(l.p)} disabled={l.qty >= l.p.stock} className="p-1 text-chocolate-light hover:text-caribe disabled:opacity-30"><Plus className="w-3.5 h-3.5" /></button>
+                      </div>
+                      <span className="font-black text-chocolate w-20 text-right">{formatPrice(l.precio * l.qty)}</span>
+                    </div>
+                    <div className="flex items-center gap-2 pl-1">
+                      <label className="text-[11px] font-bold uppercase tracking-wide text-chocolate-light">Precio c/u</label>
+                      <div className="relative flex-grow max-w-[140px]">
+                        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-chocolate-light">$</span>
+                        <input
+                          type="number" min={0} step={1000} inputMode="numeric"
+                          value={l.precio}
+                          onChange={(e) => setPrecio(l.p.id, Number(e.target.value))}
+                          className={`w-full bg-cream border rounded-lg pl-5 pr-2 py-1 text-xs font-bold text-chocolate focus:outline-none focus:border-caribe ${editado ? "border-sol" : "border-cream-dark"}`}
+                        />
+                      </div>
+                      {editado && (
+                        <button onClick={() => setPrecio(l.p.id, l.p.precio)} className="text-[11px] font-bold text-caribe hover:underline">↺ {formatPrice(l.p.precio)}</button>
+                      )}
+                    </div>
                   </div>
-                  <span className="font-black text-chocolate w-20 text-right">{formatPrice(l.p.precio * l.qty)}</span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
-          <div className="flex justify-between text-lg font-black text-chocolate border-t border-cream-dark pt-3">
-            <span>Total</span><span className="text-flamenco">{formatPrice(total)}</span>
+          {/* Descuento global */}
+          <div className="flex items-center gap-2 border-t border-cream-dark pt-3">
+            <label className="text-sm font-bold text-chocolate flex-grow">Descuento</label>
+            <div className="relative w-32">
+              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-chocolate-light">$</span>
+              <input
+                type="number" min={0} step={1000} inputMode="numeric"
+                value={descuento || ""}
+                onChange={(e) => setDescuento(Math.max(0, Math.round(Number(e.target.value)) || 0))}
+                placeholder="0"
+                className="w-full bg-cream border border-cream-dark rounded-lg pl-5 pr-2 py-1.5 text-sm font-bold text-chocolate text-right focus:outline-none focus:border-caribe"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <div className="flex justify-between text-sm text-chocolate-light">
+              <span>Subtotal</span><span className="font-semibold text-chocolate">{formatPrice(subtotal)}</span>
+            </div>
+            {desc > 0 && (
+              <div className="flex justify-between text-sm text-cactus">
+                <span>Descuento</span><span className="font-semibold">− {formatPrice(desc)}</span>
+              </div>
+            )}
+            <div className="flex justify-between text-lg font-black text-chocolate pt-1">
+              <span>Total</span><span className="text-flamenco">{formatPrice(total)}</span>
+            </div>
           </div>
 
           <div className="space-y-2">

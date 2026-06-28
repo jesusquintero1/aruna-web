@@ -1,13 +1,16 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { verifySession } from "@/lib/auth/session";
 import { createOrder, OrderError, type OrderItemInput } from "@/lib/db/orders";
-import { updateOrderStatus, type Order } from "@/lib/db/orders";
+import { updateOrderStatus, updateOrderFull, deleteOrder, type Order } from "@/lib/db/orders";
 
 export interface PosSaleInput {
   items: OrderItemInput[];
   metodoPago: string;
+  /** Descuento global sobre el subtotal (COP). */
+  descuento?: number;
   cliente?: {
     nombre?: string;
     telefono?: string;
@@ -43,6 +46,7 @@ export async function createPosSale(input: PosSaleInput): Promise<PosSaleResult>
         departamento: input.cliente?.departamento,
       },
       notas: input.notas,
+      descuento: input.descuento,
       items: input.items,
     });
     revalidatePath("/");
@@ -65,4 +69,63 @@ export async function changeOrderStatus(formData: FormData): Promise<void> {
   await updateOrderStatus(id, estado);
   revalidatePath("/admin/pedidos");
   revalidatePath(`/admin/pedidos/${id}`);
+}
+
+function revalidateOrders(id?: string) {
+  revalidatePath("/admin/pedidos");
+  if (id) revalidatePath(`/admin/pedidos/${id}`);
+  revalidatePath("/admin");
+  revalidatePath("/admin/productos");
+  revalidatePath("/admin/compras");
+  revalidatePath("/");
+  revalidatePath("/catalogo");
+}
+
+/** Elimina un pedido y devuelve el stock al inventario. */
+export async function deleteOrderAction(formData: FormData): Promise<void> {
+  await verifySession();
+  const id = String(formData.get("id") || "");
+  if (id) await deleteOrder(id);
+  revalidateOrders();
+  redirect("/admin/pedidos");
+}
+
+export interface OrderEditInput {
+  id: string;
+  estado: "pendiente" | "pagado" | "enviado" | "cancelado";
+  metodoPago?: string | null;
+  cliente?: {
+    nombre?: string | null;
+    telefono?: string | null;
+    email?: string | null;
+    cedula?: string | null;
+    ciudad?: string | null;
+    departamento?: string | null;
+    direccion?: string | null;
+  };
+  notas?: string | null;
+  descuento?: number;
+  items: OrderItemInput[];
+}
+
+/** Edición completa de un pedido (cliente, estado, ítems y descuento). */
+export async function updateOrderAction(input: OrderEditInput): Promise<PosSaleResult> {
+  await verifySession();
+  try {
+    if (!input.items?.length) return { ok: false, error: "El pedido debe tener al menos un producto." };
+    const { id } = await updateOrderFull({
+      id: input.id,
+      estado: input.estado,
+      metodoPago: input.metodoPago,
+      cliente: input.cliente,
+      notas: input.notas,
+      descuento: input.descuento,
+      items: input.items,
+    });
+    revalidateOrders(id);
+    return { ok: true, id };
+  } catch (e) {
+    if (e instanceof OrderError) return { ok: false, error: e.message };
+    return { ok: false, error: "No se pudo guardar el pedido." };
+  }
 }

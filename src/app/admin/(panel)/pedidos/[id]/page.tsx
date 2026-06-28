@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getOrderById } from "@/lib/db/orders";
-import { changeOrderStatus } from "@/lib/db/pos-actions";
+import { changeOrderStatus, deleteOrderAction } from "@/lib/db/pos-actions";
 import { formatPrice } from "@/lib/utils";
-import { ArrowLeft, User, Phone, Mail, MapPin, CreditCard } from "lucide-react";
+import { ArrowLeft, User, Phone, Mail, MapPin, CreditCard, Pencil, Trash2 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -27,13 +27,24 @@ export default async function PedidoDetalle({ params }: { params: Promise<{ id: 
             {o.channel === "pos" ? "Venta POS" : "Pedido online"} · {new Date(o.created_at).toLocaleString("es-CO")}
           </p>
         </div>
-        <form action={changeOrderStatus} className="flex items-center gap-2">
-          <input type="hidden" name="id" value={o.id} />
-          <select name="estado" defaultValue={o.estado} className="bg-white border border-cream-dark rounded-xl px-3 py-2 text-sm font-bold text-chocolate focus:outline-none focus:border-caribe">
-            {estados.map((e) => <option key={e} value={e}>{e}</option>)}
-          </select>
-          <button type="submit" className="btn-secondary px-4 py-2 text-xs uppercase tracking-wider">Actualizar</button>
-        </form>
+        <div className="flex flex-wrap items-center gap-2">
+          <form action={changeOrderStatus} className="flex items-center gap-2">
+            <input type="hidden" name="id" value={o.id} />
+            <select name="estado" defaultValue={o.estado} className="bg-white border border-cream-dark rounded-xl px-3 py-2 text-sm font-bold text-chocolate focus:outline-none focus:border-caribe">
+              {estados.map((e) => <option key={e} value={e}>{e}</option>)}
+            </select>
+            <button type="submit" className="btn-secondary px-4 py-2 text-xs uppercase tracking-wider">Estado</button>
+          </form>
+          <Link href={`/admin/pedidos/${o.id}/editar`} className="btn-secondary px-4 py-2 text-xs uppercase tracking-wider inline-flex items-center gap-1.5">
+            <Pencil className="w-3.5 h-3.5" /> Editar
+          </Link>
+          <form action={deleteOrderAction}>
+            <input type="hidden" name="id" value={o.id} />
+            <button type="submit" className="px-4 py-2 text-xs uppercase tracking-wider font-bold rounded-xl border border-flamenco/40 text-flamenco hover:bg-flamenco/10 inline-flex items-center gap-1.5">
+              <Trash2 className="w-3.5 h-3.5" /> Eliminar
+            </button>
+          </form>
+        </div>
       </div>
 
       <div className="grid sm:grid-cols-2 gap-6">
@@ -52,6 +63,12 @@ export default async function PedidoDetalle({ params }: { params: Promise<{ id: 
           <h2 className="font-title font-extrabold text-chocolate mb-2">Pago</h2>
           <div className="flex justify-between text-sm text-chocolate-light"><span>Método</span><span className="font-bold text-chocolate">{o.metodo_pago || "—"}</span></div>
           <div className="flex justify-between text-sm text-chocolate-light"><span>Estado</span><span className="font-bold text-chocolate uppercase">{o.estado}</span></div>
+          {o.descuento > 0 && (
+            <>
+              <div className="flex justify-between text-sm text-chocolate-light"><span>Subtotal</span><span className="font-bold text-chocolate">{formatPrice(o.subtotal)}</span></div>
+              <div className="flex justify-between text-sm text-cactus"><span>Descuento</span><span className="font-bold">− {formatPrice(o.descuento)}</span></div>
+            </>
+          )}
           <div className="flex justify-between text-lg font-black text-chocolate border-t border-cream-dark pt-2 mt-2"><span>Total</span><span className="text-flamenco">{formatPrice(o.total)}</span></div>
         </div>
       </div>

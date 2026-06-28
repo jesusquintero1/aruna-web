@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import { useFormStatus } from "react-dom";
-import { createPurchaseAction } from "@/lib/db/purchase-actions";
+import { createPurchaseAction, updatePurchaseAction } from "@/lib/db/purchase-actions";
 import { formatPrice } from "@/lib/utils";
 import { Loader2, Save, ArrowLeft, Plus, Trash2 } from "lucide-react";
 
@@ -12,6 +12,21 @@ export interface ProductOption {
   nombre: string;
   costo: number;
   precio: number;
+}
+
+export interface PurchaseInitial {
+  id: string;
+  proveedor: string;
+  fecha: string;
+  costoEnvio: string;
+  notas: string;
+  items: Array<{
+    product_id: string;
+    referencia: string;
+    cantidad: string;
+    costo_unitario: string;
+    precio_venta: string;
+  }>;
 }
 
 interface Row {
@@ -29,25 +44,39 @@ function emptyRow(): Row {
   return { key: nextKey++, product_id: "", nombre: "", referencia: "", cantidad: "1", costo_unitario: "", precio_venta: "" };
 }
 
+function rowsFromInitial(initial: PurchaseInitial): Row[] {
+  if (!initial.items.length) return [emptyRow()];
+  return initial.items.map((it) => ({
+    key: nextKey++,
+    product_id: it.product_id,
+    nombre: "",
+    referencia: it.referencia,
+    cantidad: it.cantidad,
+    costo_unitario: it.costo_unitario,
+    precio_venta: it.precio_venta,
+  }));
+}
+
 const field = "w-full bg-cream border border-cream-dark rounded-xl px-3 py-2 text-sm text-chocolate font-semibold focus:outline-none focus:border-caribe";
 const label = "text-xs font-black uppercase tracking-wide text-chocolate";
 
-function SubmitBtn({ disabled }: { disabled: boolean }) {
+function SubmitBtn({ disabled, label }: { disabled: boolean; label: string }) {
   const { pending } = useFormStatus();
   return (
     <button type="submit" disabled={pending || disabled} className="btn-primary px-7 py-3 text-sm uppercase tracking-wider disabled:opacity-60">
       {pending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-      {pending ? "Guardando…" : "Guardar pedido"}
+      {pending ? "Guardando…" : label}
     </button>
   );
 }
 
-export default function PurchaseForm({ productos }: { productos: ProductOption[] }) {
-  const [rows, setRows] = useState<Row[]>([emptyRow()]);
-  const [proveedor, setProveedor] = useState("");
-  const [fecha, setFecha] = useState("");
-  const [costoEnvio, setCostoEnvio] = useState("");
-  const [notas, setNotas] = useState("");
+export default function PurchaseForm({ productos, initial }: { productos: ProductOption[]; initial?: PurchaseInitial }) {
+  const editing = Boolean(initial);
+  const [rows, setRows] = useState<Row[]>(initial ? rowsFromInitial(initial) : [emptyRow()]);
+  const [proveedor, setProveedor] = useState(initial?.proveedor ?? "");
+  const [fecha, setFecha] = useState(initial?.fecha ?? "");
+  const [costoEnvio, setCostoEnvio] = useState(initial?.costoEnvio ?? "");
+  const [notas, setNotas] = useState(initial?.notas ?? "");
 
   const update = (key: number, patch: Partial<Row>) =>
     setRows((rs) => rs.map((r) => (r.key === key ? { ...r, ...patch } : r)));
@@ -96,12 +125,17 @@ export default function PurchaseForm({ productos }: { productos: ProductOption[]
       <Link href="/admin/compras" className="inline-flex items-center gap-2 text-sm font-bold text-chocolate-light hover:text-caribe">
         <ArrowLeft className="w-4 h-4" /> Volver a pedidos
       </Link>
-      <h1 className="font-lux font-bold text-3xl text-chocolate">Nuevo pedido de proveedor</h1>
+      <h1 className="font-lux font-bold text-3xl text-chocolate">
+        {editing ? `Editar pedido ${initial!.id}` : "Nuevo pedido de proveedor"}
+      </h1>
       <p className="text-sm text-chocolate-light -mt-3">
-        Carga varias mochilas de un mismo pedido. Cada línea suma stock; si eliges una referencia existente, las unidades se acumulan a ese producto.
+        {editing
+          ? "Al guardar se revierte el stock anterior de este pedido y se aplican las nuevas cantidades. En edición solo puedes ajustar referencias existentes (para nuevas, usa “Nuevo pedido”)."
+          : "Carga varias mochilas de un mismo pedido. Cada línea suma stock; si eliges una referencia existente, las unidades se acumulan a ese producto."}
       </p>
 
-      <form action={createPurchaseAction} className="space-y-6">
+      <form action={editing ? updatePurchaseAction : createPurchaseAction} className="space-y-6">
+        {editing && <input type="hidden" name="id" value={initial!.id} />}
         <input type="hidden" name="payload" value={payload} />
 
         {/* Cabecera */}
@@ -136,7 +170,8 @@ export default function PurchaseForm({ productos }: { productos: ProductOption[]
             <div key={r.key} className="grid grid-cols-1 lg:grid-cols-[2fr_1fr_0.7fr_1fr_1fr_auto] gap-3 items-start border-b border-cream-dark/60 lg:border-0 pb-3 lg:pb-0">
               <div className="space-y-2">
                 <select value={r.product_id} onChange={(e) => onSelectProduct(r.key, e.target.value)} className={field}>
-                  <option value="">➕ Nueva referencia…</option>
+                  {!editing && <option value="">➕ Nueva referencia…</option>}
+                  {editing && <option value="">— Selecciona referencia —</option>}
                   {productos.map((p) => (
                     <option key={p.id} value={p.id}>{p.nombre}</option>
                   ))}
@@ -168,7 +203,7 @@ export default function PurchaseForm({ productos }: { productos: ProductOption[]
             <div><p className="text-xs text-chocolate-light font-bold uppercase">Venta total</p><p className="font-black text-chocolate">{formatPrice(totals.venta)}</p></div>
             <div><p className="text-xs text-chocolate-light font-bold uppercase">Ganancia potencial</p><p className="font-black text-cactus">{formatPrice(gananciaPotencial)}</p></div>
           </div>
-          <SubmitBtn disabled={!valido} />
+          <SubmitBtn disabled={!valido} label={editing ? "Guardar cambios" : "Guardar pedido"} />
         </div>
       </form>
     </div>

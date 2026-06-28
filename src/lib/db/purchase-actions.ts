@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { verifySession } from "@/lib/auth/session";
-import { createPurchaseOrder, type PurchaseItemInput } from "@/lib/db/purchases";
+import { createPurchaseOrder, updatePurchaseOrder, deletePurchaseOrder, type PurchaseItemInput } from "@/lib/db/purchases";
 
 function slugify(s: string): string {
   return s
@@ -81,10 +81,75 @@ export async function createPurchaseAction(formData: FormData): Promise<void> {
     items,
   });
 
+  revalidateCompras();
+  redirect("/admin/compras");
+}
+
+function revalidateCompras(id?: string) {
   revalidatePath("/admin/compras");
+  if (id) revalidatePath(`/admin/compras/${id}`);
   revalidatePath("/admin/productos");
   revalidatePath("/admin");
   revalidatePath("/");
   revalidatePath("/catalogo");
+}
+
+/**
+ * Edita un pedido de proveedor existente. Solo opera sobre referencias
+ * existentes (las líneas sin producto seleccionado se ignoran). El RPC
+ * revierte el stock anterior y reaplica las cantidades/costos nuevos.
+ */
+export async function updatePurchaseAction(formData: FormData): Promise<void> {
+  await verifySession();
+
+  const id = String(formData.get("id") || "").trim();
+  if (!id) throw new Error("Falta el identificador del pedido.");
+
+  let payload: {
+    proveedor?: string;
+    fecha?: string;
+    costoEnvio?: number | string;
+    notas?: string;
+    items?: RawItem[];
+  };
+  try {
+    payload = JSON.parse(String(formData.get("payload") || "{}"));
+  } catch {
+    throw new Error("Datos del pedido inválidos.");
+  }
+
+  const items: PurchaseItemInput[] = (payload.items || [])
+    .filter((it) => it.product_id) // edición: solo referencias existentes
+    .map((it) => ({
+      product_id: String(it.product_id),
+      is_new: false,
+      referencia: (it.referencia || "").trim() || undefined,
+      cantidad: toInt(it.cantidad),
+      costo_unitario: toInt(it.costo_unitario),
+      precio_venta: toInt(it.precio_venta),
+    }))
+    .filter((it) => it.cantidad > 0);
+
+  if (!items.length) throw new Error("Agrega al menos una referencia existente con cantidad.");
+
+  await updatePurchaseOrder({
+    id,
+    proveedor: (payload.proveedor || "").trim() || null,
+    fecha: payload.fecha || null,
+    costoEnvio: toInt(payload.costoEnvio),
+    notas: (payload.notas || "").trim() || null,
+    items,
+  });
+
+  revalidateCompras(id);
+  redirect(`/admin/compras/${id}`);
+}
+
+/** Elimina un pedido de proveedor y resta del stock las unidades compradas. */
+export async function deletePurchaseAction(formData: FormData): Promise<void> {
+  await verifySession();
+  const id = String(formData.get("id") || "").trim();
+  if (id) await deletePurchaseOrder(id);
+  revalidateCompras();
   redirect("/admin/compras");
 }
