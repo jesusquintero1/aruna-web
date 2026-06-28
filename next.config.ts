@@ -20,9 +20,12 @@ const csp = [
 ].join("; ");
 
 const securityHeaders = [
-  // CSP en modo Report-Only durante el rodaje. Cambiar la clave a
-  // "Content-Security-Policy" para aplicarla (enforcing) cuando esté validada.
-  { key: "Content-Security-Policy-Report-Only", value: csp },
+  // CSP en modo enforcing. Se validó que no hay scripts/conexiones externas
+  // (Mercado Pago es server-side por redirección, fuentes auto-alojadas con
+  // next/font, imágenes solo de Supabase/Unsplash, scripts inline = JSON-LD
+  // cubiertos por 'unsafe-inline'). Si se añade analítica/SDK externo, agregar
+  // su origen a script-src/connect-src antes de desplegar.
+  { key: "Content-Security-Policy", value: csp },
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-Content-Type-Options", value: "nosniff" },
