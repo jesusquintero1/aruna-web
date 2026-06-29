@@ -33,6 +33,7 @@ export default function HomeClient({ featured, disponibles }: HomeClientProps) {
 
   const [review, setReview] = useState(0);
   useEffect(() => {
+    if (siteConfig.testimonials.length === 0) return;
     const t = setInterval(() => setReview((r) => (r + 1) % siteConfig.testimonials.length), 6000);
     return () => clearInterval(t);
   }, []);
@@ -281,39 +282,46 @@ export default function HomeClient({ featured, disponibles }: HomeClientProps) {
       </section>
 
       {/* ================= 7. TESTIMONIOS ================= */}
-      <section className="max-w-3xl mx-auto px-4 pt-24 text-center space-y-8">
-        <Reveal className="space-y-3">
-          <span className="text-xs uppercase font-black tracking-[0.3em] text-flamenco">Voces reales</span>
-          <h2 className="font-lux font-bold text-4xl sm:text-5xl text-chocolate">Historias que enamoran</h2>
-        </Reveal>
-        <Reveal className="relative bg-white border-gold-lux rounded-[32px] p-8 sm:p-12 shadow-sm">
-          <Quote className="w-10 h-10 text-gold-lux/30 mx-auto mb-4" />
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={review}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.4 }}
-              className="space-y-4"
-            >
-              <div className="text-sol text-lg">{"★".repeat(siteConfig.testimonials[review].stars)}</div>
-              <p className="font-lux text-xl sm:text-2xl text-chocolate font-medium leading-relaxed italic">
-                &quot;{siteConfig.testimonials[review].text}&quot;
-              </p>
-              <div>
-                <p className="font-title font-extrabold text-chocolate">{siteConfig.testimonials[review].name}</p>
-                <p className="text-xs text-chocolate-light font-bold uppercase tracking-wide">{siteConfig.testimonials[review].location}</p>
+      {/* Solo se muestra cuando hay testimonios REALES en config/site.ts.
+          Vacío por defecto: no inventamos reseñas (Ley 1480). */}
+      {siteConfig.testimonials.length > 0 && (() => {
+        const t = siteConfig.testimonials[review % siteConfig.testimonials.length];
+        return (
+          <section className="max-w-3xl mx-auto px-4 pt-24 text-center space-y-8">
+            <Reveal className="space-y-3">
+              <span className="text-xs uppercase font-black tracking-[0.3em] text-flamenco">Voces reales</span>
+              <h2 className="font-lux font-bold text-4xl sm:text-5xl text-chocolate">Historias que enamoran</h2>
+            </Reveal>
+            <Reveal className="relative bg-white border-gold-lux rounded-[32px] p-8 sm:p-12 shadow-sm">
+              <Quote className="w-10 h-10 text-gold-lux/30 mx-auto mb-4" />
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={review}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.4 }}
+                  className="space-y-4"
+                >
+                  <div className="text-sol text-lg">{"★".repeat(t.stars)}</div>
+                  <p className="font-lux text-xl sm:text-2xl text-chocolate font-medium leading-relaxed italic">
+                    &quot;{t.text}&quot;
+                  </p>
+                  <div>
+                    <p className="font-title font-extrabold text-chocolate">{t.name}</p>
+                    <p className="text-xs text-chocolate-light font-bold uppercase tracking-wide">{t.location}</p>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+              <div className="flex justify-center gap-2 pt-6">
+                {siteConfig.testimonials.map((_, i) => (
+                  <button key={i} onClick={() => setReview(i)} className={`h-2 rounded-full transition-all ${i === review ? "bg-gold-lux w-6" : "bg-cream-dark w-2"}`} aria-label={`Testimonio ${i + 1}`} />
+                ))}
               </div>
-            </motion.div>
-          </AnimatePresence>
-          <div className="flex justify-center gap-2 pt-6">
-            {siteConfig.testimonials.map((_, i) => (
-              <button key={i} onClick={() => setReview(i)} className={`h-2 rounded-full transition-all ${i === review ? "bg-gold-lux w-6" : "bg-cream-dark w-2"}`} aria-label={`Testimonio ${i + 1}`} />
-            ))}
-          </div>
-        </Reveal>
-      </section>
+            </Reveal>
+          </section>
+        );
+      })()}
 
       {/* ================= 8. FAQ ================= */}
       <section className="max-w-3xl mx-auto px-4 pt-24 space-y-8">
