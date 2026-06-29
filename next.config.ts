@@ -6,13 +6,18 @@ import type { NextConfig } from "next";
 // auto-aloja las fuentes (font-src 'self'). Las imágenes vienen de Supabase Storage
 // y Unsplash. Se publica primero en modo Report-Only (ver header abajo): tras unos
 // días sin violaciones, cambiar la cabecera a "Content-Security-Policy" (enforcing).
+// Dominios de analítica (GA4 + Meta Pixel). Se agregan a la CSP aunque la
+// analítica esté apagada (inofensivo si no se cargan scripts). Los scripts solo
+// se inyectan tras consentimiento (ver components/AnalyticsScripts.tsx).
+const GA = "https://*.googletagmanager.com https://*.google-analytics.com";
+
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  `script-src 'self' 'unsafe-inline' https://*.googletagmanager.com https://connect.facebook.net`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: https://*.supabase.co https://images.unsplash.com",
+  `img-src 'self' data: https://*.supabase.co https://images.unsplash.com ${GA} https://*.facebook.com`,
   "font-src 'self'",
-  "connect-src 'self' https://*.supabase.co",
+  `connect-src 'self' https://*.supabase.co ${GA} https://*.facebook.com`,
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
