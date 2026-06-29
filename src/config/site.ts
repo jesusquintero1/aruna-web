@@ -61,26 +61,11 @@ export const siteConfig = {
   ],
 
   // TESTIMONIOS (PRUEBA SOCIAL)
-  testimonials: [
-    {
-      name: "Mariana Restrepo",
-      location: "Medellín, Colombia",
-      text: "La mochila es simplemente espectacular. Los colores son vibrantes y los acabados son perfectos. Se nota el amor y el trabajo en cada detalle. Definitivamente volveré a comprar.",
-      stars: 5,
-    },
-    {
-      name: "Jean-Pierre Laurent",
-      location: "París, Francia",
-      text: "Compré una mochila para mi esposa y está encantada. Llegó a Francia en solo 5 días en un empaque hermoso. El servicio al cliente por WhatsApp fue sumamente atento y profesional. Un pedazo de arte real.",
-      stars: 5,
-    },
-    {
-      name: "Camila Echeverry",
-      location: "Bogotá, Colombia",
-      text: "Me encanta el enfoque de comercio justo de ARÜNA. Recibir una mochila única, saber quién la tejió y saber que se apoya a la comunidad indígena de La Guajira hace que la compra sea sumamente especial.",
-      stars: 5,
-    }
-  ],
+  // VACÍO a propósito: no inventamos reseñas (Ley 1480 / publicidad engañosa).
+  // Cuando tengas reseñas REALES de clientes, agrégalas aquí y la sección
+  // "Historias que enamoran" del inicio reaparece automáticamente. Formato:
+  //   { name: "Nombre", location: "Ciudad, País", text: "Su reseña…", stars: 5 }
+  testimonials: [] as { name: string; location: string; text: string; stars: number }[],
 
   // PALABRAS CLAVE PARA SEO
   seoKeywords: [
