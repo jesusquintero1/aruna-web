@@ -116,6 +116,19 @@ export async function createCategory(formData: FormData): Promise<void> {
   revalidatePath("/admin/categorias");
 }
 
+export async function updateCategory(formData: FormData): Promise<void> {
+  await verifySession();
+  const db = getSupabase();
+  if (!db) throw new Error("Supabase no está configurado.");
+  const id = String(formData.get("id") || "").trim();
+  const nombre = String(formData.get("nombre") || "").trim();
+  if (!id || !nombre) return;
+  const orden = parseInt(String(formData.get("orden") || "0"), 10) || 0;
+  await db.from("categories").update({ nombre, slug: slugify(nombre), orden }).eq("id", id);
+  revalidatePath("/admin/categorias");
+  revalidateStore();
+}
+
 export async function deleteCategory(formData: FormData): Promise<void> {
   await verifySession();
   const db = getSupabase();
