@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { siteConfig } from "@/config/site";
 import { MapPin, Mail, Heart, Truck, ShieldCheck, HeartHandshake } from "lucide-react";
+import NewsletterForm from "@/components/NewsletterForm";
 
 const InstagramIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -26,6 +27,17 @@ export default function Footer() {
       <div className="h-2 bg-kana-border opacity-90" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8 relative z-10">
+        {/* Newsletter */}
+        <div className="bg-white/5 border border-white/10 rounded-3xl p-6 sm:p-8 mb-14 grid lg:grid-cols-2 gap-6 items-center">
+          <div>
+            <h3 className="font-title font-bold text-2xl text-arena">Únete a la comunidad ARÜNA</h3>
+            <p className="text-sm text-arena/70 mt-1.5 max-w-md">
+              Recibe lanzamientos, historias y leyendas de La Guajira. Sin spam, solo lo bueno.
+            </p>
+          </div>
+          <NewsletterForm fuente="footer" />
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-14">
           {/* Marca */}
           <div className="space-y-5">
@@ -98,7 +110,19 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-arena/50 gap-4">
+        {/* Enlaces legales */}
+        <div className="border-t border-white/10 pt-6 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-arena/60">
+          {[
+            { name: "Términos y condiciones", path: "/terminos" },
+            { name: "Política de privacidad", path: "/privacidad" },
+            { name: "Cambios y devoluciones", path: "/devoluciones" },
+            { name: "Política de cookies", path: "/cookies" },
+          ].map((l) => (
+            <Link key={l.path} href={l.path} className="hover:text-caribe transition-colors">{l.name}</Link>
+          ))}
+        </div>
+
+        <div className="border-t border-white/10 mt-6 pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-arena/50 gap-4">
           <p>© {new Date().getFullYear()} ARÜNA. Hecho con orgullo en Colombia.</p>
           <div className="flex items-center gap-1.5">
             <span>Tejido con</span>

@@ -23,6 +23,17 @@ export const siteConfig = {
     facebook: "https://facebook.com/aruna.guajira",
   },
 
+  // IDENTIDAD LEGAL (para páginas legales y facturación).
+  // IMPORTANTE: reemplazar los placeholders por los datos reales del negocio
+  // antes de salir a producción, y revisar los textos legales con un abogado.
+  legal: {
+    razonSocial: "[RAZÓN SOCIAL]",       // p. ej. "ARÜNA S.A.S." o nombre del comerciante
+    nit: "[NIT / CÉDULA]",
+    domicilio: "Maicao, La Guajira, Colombia",
+    ciudad: "Maicao, La Guajira",
+    vigenciaDesde: "2026",
+  },
+
   // CONFIGURACIÓN DE ENVÍOS Y GARANTÍAS
   shipping: {
     national: "Envíos gratis a toda Colombia",
