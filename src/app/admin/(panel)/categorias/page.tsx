@@ -1,7 +1,8 @@
 import { getCategories } from "@/lib/db/categories";
 import { isSupabaseConfigured } from "@/lib/supabase/server";
-import { createCategory, deleteCategory } from "@/lib/db/admin-actions";
-import { Plus, Trash2, Tags } from "lucide-react";
+import { createCategory } from "@/lib/db/admin-actions";
+import CategoriaRow from "@/components/admin/CategoriaRow";
+import { Plus } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +14,7 @@ export default async function AdminCategorias() {
     <div className="space-y-6 max-w-2xl">
       <div>
         <h1 className="font-lux font-bold text-3xl text-chocolate">Categorías</h1>
-        <p className="text-sm text-chocolate-light">Organiza tus productos por colección</p>
+        <p className="text-sm text-chocolate-light">Organiza tus productos por colección. Edita el nombre o el orden (menor aparece primero).</p>
       </div>
 
       {!configured && (
@@ -33,17 +34,7 @@ export default async function AdminCategorias() {
         ) : (
           <div className="divide-y divide-cream-dark">
             {categorias.map((c) => (
-              <div key={c.id} className="flex items-center justify-between p-4">
-                <span className="flex items-center gap-2.5 font-bold text-chocolate">
-                  <Tags className="w-4 h-4 text-caribe" /> {c.nombre}
-                </span>
-                <form action={deleteCategory}>
-                  <input type="hidden" name="id" value={c.id} />
-                  <button type="submit" className="p-2 text-chocolate-light hover:text-flamenco rounded-lg hover:bg-cream" aria-label="Eliminar">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </form>
-              </div>
+              <CategoriaRow key={c.id} categoria={c} />
             ))}
           </div>
         )}
