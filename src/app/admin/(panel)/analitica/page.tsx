@@ -2,7 +2,7 @@ import { getAnalytics, type ProductAnalytics } from "@/lib/db/analytics";
 import { formatPrice } from "@/lib/utils";
 import {
   TrendingUp, Coins, Percent, Receipt, Boxes, ShoppingBag, Wallet, AlertTriangle,
-  Lightbulb, PackageX, RefreshCw, Tag, Crown, ArrowUpRight,
+  Lightbulb, PackageX, RefreshCw, Tag, Crown, ArrowUpRight, Rocket, Sprout,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -39,6 +39,7 @@ function HBar({ nombre, valor, max, etiqueta, color = "bg-caribe" }: { nombre: s
 }
 
 const RECO_META: Record<string, { icon: typeof Lightbulb; color: string; bg: string }> = {
+  lanzamiento: { icon: Rocket, color: "text-caribe", bg: "bg-caribe/10 border-caribe/30" },
   reabastecer: { icon: RefreshCw, color: "text-caribe", bg: "bg-caribe/10 border-caribe/30" },
   liquidar: { icon: PackageX, color: "text-flamenco", bg: "bg-flamenco/10 border-flamenco/30" },
   promocionar: { icon: Crown, color: "text-gold-deep", bg: "bg-gold-lux/10 border-gold-lux/40" },
@@ -83,6 +84,18 @@ export default async function AnaliticaPage() {
         <p className="text-sm text-chocolate-light">Métricas y recomendaciones para decidir y crecer, calculadas con tus datos reales.</p>
       </div>
 
+      {/* Aviso de etapa de lanzamiento */}
+      {a.etapaLanzamiento && (
+        <div className="flex items-start gap-3 bg-caribe/10 border border-caribe/30 rounded-2xl p-4 text-sm text-chocolate">
+          <Rocket className="w-5 h-5 text-caribe flex-shrink-0 mt-0.5" />
+          <div>
+            <b>Negocio en etapa de lanzamiento.</b> Tu catálogo tiene ~{a.edadCatalogoDias} {a.edadCatalogoDias === 1 ? "día" : "días"} y aún no has hecho marketing.
+            Que muchos productos no hayan vendido todavía es <b>normal</b> — no es inventario muerto. La analítica lo trata como inventario
+            <b> nuevo (en introducción)</b> y solo marcará algo como “muerto” si pasa {a.diasMaduracion}+ días sin vender. Interpreta los números como una línea base, no como un diagnóstico final.
+          </div>
+        </div>
+      )}
+
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Kpi label="Ingresos (pagados)" value={fmt(a.ingresosTotales)} hint={`${a.pedidosPagados} ventas`} icon={Coins} color="text-gold-deep" />
@@ -91,8 +104,12 @@ export default async function AnaliticaPage() {
         <Kpi label="Ticket promedio" value={fmt(a.ticketPromedio)} hint="Por venta" icon={Receipt} color="text-chocolate" />
         <Kpi label="Unidades vendidas" value={String(a.unidadesVendidas)} hint={`${a.productosVendidosDistintos} productos distintos`} icon={ShoppingBag} color="text-flamenco" />
         <Kpi label="Capital en stock" value={fmt(a.capitalEnStock)} hint="Stock × costo" icon={Wallet} color="text-chocolate" />
-        <Kpi label="Inventario muerto" value={fmt(a.inventarioMuertoValor)} hint={`${a.inventarioMuerto.length} sin vender`} icon={Boxes} color="text-flamenco" />
-        <Kpi label="Por reabastecer" value={String(a.reabastecer.length)} hint="Venden y casi sin stock" icon={RefreshCw} color="text-caribe" />
+        {a.inventarioMuerto.length > 0 ? (
+          <Kpi label="Inventario muerto" value={fmt(a.inventarioMuertoValor)} hint={`${a.inventarioMuerto.length} sin vender +${a.diasMaduracion}d`} icon={Boxes} color="text-flamenco" />
+        ) : (
+          <Kpi label="Inventario nuevo" value={fmt(a.enIntroduccionValor)} hint={`${a.enIntroduccion.length} en introducción`} icon={Sprout} color="text-cactus" />
+        )}
+        <Kpi label="Por reabastecer" value={String(a.reabastecer.length)} hint="Ya vendieron y stock bajo" icon={RefreshCw} color="text-caribe" />
       </div>
 
       {/* Recomendaciones */}
@@ -170,17 +187,29 @@ export default async function AnaliticaPage() {
         </div>
       </div>
 
-      {/* Rotación: inventario muerto + reabastecer */}
+      {/* Rotación: inventario muerto (maduro) o en introducción (nuevo) + reabastecer */}
       <div className="grid lg:grid-cols-2 gap-6">
-        <RotacionTabla
-          titulo="Inventario muerto (no rota)"
-          subtitulo="Con stock, sin una sola venta. Capital atrapado."
-          icon={PackageX}
-          iconColor="text-flamenco"
-          rows={a.inventarioMuerto.slice(0, 10)}
-          render={(p) => ({ izq: p.nombre, der: `${p.stock} u · ${fmt(p.capitalEnStock)}`, sub: `${p.diasDesdeAlta} días en catálogo` })}
-          vacio="¡Bien! Todo tu inventario ha tenido al menos una venta."
-        />
+        {a.inventarioMuerto.length > 0 ? (
+          <RotacionTabla
+            titulo={`Inventario muerto (${a.diasMaduracion}+ días sin vender)`}
+            subtitulo="Con stock, sin una sola venta tras tiempo suficiente. Capital atrapado."
+            icon={PackageX}
+            iconColor="text-flamenco"
+            rows={a.inventarioMuerto.slice(0, 10)}
+            render={(p) => ({ izq: p.nombre, der: `${p.stock} u · ${fmt(p.capitalEnStock)}`, sub: `${p.diasDesdeAlta} días en catálogo` })}
+            vacio="¡Bien! Nada lleva demasiado tiempo sin vender."
+          />
+        ) : (
+          <RotacionTabla
+            titulo="Inventario nuevo (en introducción)"
+            subtitulo={`Aún sin su primera venta, pero con menos de ${a.diasMaduracion} días. Es normal: dales tiempo y tráfico.`}
+            icon={Sprout}
+            iconColor="text-cactus"
+            rows={a.enIntroduccion.slice(0, 10)}
+            render={(p) => ({ izq: p.nombre, der: `${p.stock} u · ${fmt(p.capitalEnStock)}`, sub: `${p.diasDesdeAlta} ${p.diasDesdeAlta === 1 ? "día" : "días"} en catálogo` })}
+            vacio="Todos tus productos ya han vendido al menos una vez."
+          />
+        )}
         <RotacionTabla
           titulo="Reabastecer pronto"
           subtitulo="Venden y están en stock bajo. No te quedes sin ellos."
