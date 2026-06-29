@@ -3,69 +3,45 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, BadgeCheck } from "lucide-react";
-import { productos } from "@/data/productos";
-
-const ciudades = [
-  "Bogotá", "Medellín", "Cali", "Barranquilla", "Cartagena",
-  "Bucaramanga", "Pereira", "Santa Marta", "Manizales", "París, FR",
-  "Madrid, ES", "Miami, US",
-];
-const nombres = [
-  "Valentina", "Mariana", "Catalina", "Daniela", "Camila", "Isabella",
-  "Sofía", "Laura", "Andrés", "Sébastien", "Lucía", "Manuela",
-];
-
-interface Toast {
-  nombre: string;
-  ciudad: string;
-  producto: string;
-  imagen: string;
-  hace: string;
-}
-
-function build(): Toast {
-  const p = productos[Math.floor(Math.random() * productos.length)];
-  return {
-    nombre: nombres[Math.floor(Math.random() * nombres.length)],
-    ciudad: ciudades[Math.floor(Math.random() * ciudades.length)],
-    producto: p.nombre,
-    imagen: p.imagenes[0],
-    hace: `hace ${Math.floor(Math.random() * 40) + 3} min`,
-  };
-}
+import { X, ShoppingBag } from "lucide-react";
+import type { PublicPurchase } from "@/lib/db/orders";
 
 /**
- * Notificaciones flotantes de "compras recientes". Psicología de venta:
- * prueba social + FOMO. Aparece tras un retraso inicial y rota suavemente.
+ * Notificaciones flotantes de compras REALES recientes (anonimizadas: solo
+ * ciudad + producto, sin nombre). Prueba social honesta — nada inventado.
+ * Si no hay compras que mostrar, no se renderiza.
  */
-export default function SocialProofToast() {
-  const [toast, setToast] = useState<Toast | null>(null);
+export default function SocialProofToast({ purchases }: { purchases: PublicPurchase[] }) {
+  const [idx, setIdx] = useState(0);
+  const [show, setShow] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    if (dismissed) return;
+    if (dismissed || purchases.length === 0) return;
     let hideTimer: ReturnType<typeof setTimeout>;
 
     const cycle = () => {
-      setToast(build());
-      hideTimer = setTimeout(() => setToast(null), 6000);
+      setIdx((i) => (i + 1) % purchases.length);
+      setShow(true);
+      hideTimer = setTimeout(() => setShow(false), 6000);
     };
 
     const firstTimer = setTimeout(cycle, 5000);
     const interval = setInterval(cycle, 16000);
-
     return () => {
       clearTimeout(firstTimer);
       clearTimeout(hideTimer);
       clearInterval(interval);
     };
-  }, [dismissed]);
+  }, [dismissed, purchases.length]);
+
+  if (purchases.length === 0 || dismissed) return null;
+  const p = purchases[idx];
 
   return (
     <div className="fixed bottom-5 left-4 z-50 max-w-[300px] pointer-events-none">
       <AnimatePresence>
-        {toast && !dismissed && (
+        {show && p && (
           <motion.div
             initial={{ opacity: 0, x: -30, scale: 0.92 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
@@ -80,16 +56,19 @@ export default function SocialProofToast() {
             >
               <X className="w-3.5 h-3.5" />
             </button>
-            <div className="relative w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-cream-dark/20">
-              <Image src={toast.imagen} alt={toast.producto} fill className="object-cover" sizes="48px" />
+            <div className="relative w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-cream-dark/20 flex items-center justify-center">
+              {p.imagen ? (
+                <Image src={p.imagen} alt={p.producto} fill className="object-cover" sizes="48px" />
+              ) : (
+                <ShoppingBag className="w-5 h-5 text-caribe" />
+              )}
             </div>
             <div className="leading-tight min-w-0">
-              <p className="text-[11px] font-bold text-chocolate flex items-center gap-1">
-                {toast.nombre} de {toast.ciudad}
-                <BadgeCheck className="w-3.5 h-3.5 text-caribe flex-shrink-0" />
+              <p className="text-[11px] font-bold text-chocolate">
+                {p.ciudad ? `Alguien de ${p.ciudad}` : "Alguien"} compró
               </p>
-              <p className="text-[11px] text-chocolate-light truncate">compró <b className="text-chocolate">{toast.producto}</b></p>
-              <p className="text-[10px] text-cactus font-bold uppercase tracking-wide">✦ Compra verificada · {toast.hace}</p>
+              <p className="text-[11px] text-chocolate-light truncate"><b className="text-chocolate">{p.producto}</b></p>
+              <p className="text-[10px] text-cactus font-bold uppercase tracking-wide">✦ Compra reciente</p>
             </div>
           </motion.div>
         )}

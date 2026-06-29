@@ -219,3 +219,46 @@ export async function expirePendingOrders(minutes = 60): Promise<number> {
   }
   return typeof data === "number" ? data : 0;
 }
+
+/** Compra reciente anonimizada para la prueba social pública (sin nombre del cliente). */
+export interface PublicPurchase {
+  ciudad: string | null;
+  producto: string;
+  imagen: string | null;
+}
+
+interface PublicPurchaseRow {
+  cliente_ciudad: string | null;
+  created_at: string;
+  order_items: { nombre_snapshot: string; product_id: string | null; products: { imagenes: string[] | null } | null }[] | null;
+}
+
+/**
+ * Compras REALES recientes (pagadas/enviadas), anonimizadas para la prueba social.
+ * Devuelve solo ciudad + producto + imagen — nunca el nombre ni el correo del
+ * cliente. Sin DB (demo) o sin ventas: array vacío (el toast no se muestra).
+ */
+export async function getRecentPublicPurchases(limit = 12): Promise<PublicPurchase[]> {
+  const db = getSupabase();
+  if (!db) return [];
+  const { data, error } = await db
+    .from("orders")
+    .select("cliente_ciudad, created_at, order_items(nombre_snapshot, product_id, products(imagenes))")
+    .in("estado", ["pagado", "enviado"])
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (error || !data) return [];
+
+  const out: PublicPurchase[] = [];
+  for (const o of data as unknown as PublicPurchaseRow[]) {
+    const item = (o.order_items ?? [])[0];
+    if (!item) continue;
+    const imgs = item.products?.imagenes ?? null;
+    out.push({
+      ciudad: (o.cliente_ciudad || "").trim() || null,
+      producto: item.nombre_snapshot,
+      imagen: imgs && imgs.length ? imgs[0] : null,
+    });
+  }
+  return out;
+}
