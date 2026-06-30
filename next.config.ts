@@ -39,6 +39,16 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Las imágenes de producto se suben por una Server Action (saveProduct), cuyo
+  // límite de cuerpo por defecto es 1 MB. Las fotos de celular pesan 2–5 MB, así
+  // que sin esto la subida falla en silencio ("no deja montar las imágenes").
+  // Nota: en Netlify la función igual tiene su propio tope (~6 MB por request);
+  // para fotos muy pesadas conviene redimensionarlas antes de subir.
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "10mb",
+    },
+  },
   images: {
     remotePatterns: [
       // Imágenes subidas por el admin a Supabase Storage
