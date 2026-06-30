@@ -452,15 +452,20 @@ declare
   v_venta int;
   v_is_new boolean;
   v_exists boolean;
+  v_affected text[] := '{}';   -- productos tocados (para el tope final)
 begin
   if not exists (select 1 from purchase_orders where id = p_id) then
     raise exception 'COMPRA_NO_EXISTE:%', p_id;
   end if;
 
+  -- Revertir el stock anterior SIN tope: la resta debe ser exacta para que
+  -- "revertir + reaplicar la misma cantidad" sea un no-op (si se topa a 0 aquí
+  -- y luego se reaplica sin tope, se resucitan unidades ya vendidas).
   for v_it in select product_id, cantidad from purchase_items where purchase_order_id = p_id
   loop
     if v_it.product_id is not null then
-      update products set stock = greatest(0, stock - v_it.cantidad) where id = v_it.product_id;
+      update products set stock = stock - v_it.cantidad where id = v_it.product_id;
+      v_affected := array_append(v_affected, v_it.product_id);
     end if;
   end loop;
 
@@ -510,9 +515,17 @@ begin
       where id = v_pid;
     end if;
 
+    v_affected := array_append(v_affected, v_pid);
+
     insert into purchase_items (purchase_order_id, product_id, referencia, cantidad, costo_unitario, precio_venta)
     values (p_id, v_pid, nullif(v_item->>'referencia', ''), v_qty, v_costo, v_venta);
   end loop;
+
+  -- Tope final: ningún producto tocado debe quedar con stock negativo
+  -- (solo aplica a casos de sobreventa; el no-op de arriba ya quedó exacto).
+  if array_length(v_affected, 1) is not null then
+    update products set stock = greatest(0, stock) where id = any(v_affected);
+  end if;
 
   return p_id;
 end;
