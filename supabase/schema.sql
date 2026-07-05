@@ -14,6 +14,8 @@ create table if not exists categories (
   nombre text not null,
   slug text not null unique,
   orden int not null default 0,
+  linea text not null default 'mochilas'
+    check (linea in ('mochilas','maquillaje')),
   created_at timestamptz not null default now()
 );
 
@@ -36,11 +38,21 @@ create table if not exists products (
     check (simbolo in ('colibri','flamenco','cardenal','cactus','lirios','delfines')),
   destacado boolean not null default false,
   stock int not null default 1,
+  -- Línea de producto: mochilas wayuu o maquillaje (cada una con su
+  -- dashboard e inventario en el admin y su catálogo en la tienda).
+  linea text not null default 'mochilas'
+    check (linea in ('mochilas','maquillaje')),
+  -- Borrador → publicado: solo los publicados aparecen en la tienda.
+  publicado boolean not null default true,
+  -- Videos del producto (URLs públicas en Storage).
+  videos text[] not null default '{}',
   created_at timestamptz not null default now()
 );
 
 create index if not exists products_categoria_idx on products(categoria_id);
 create index if not exists products_destacado_idx on products(destacado);
+create index if not exists products_linea_idx on products(linea);
+create index if not exists products_publicado_idx on products(publicado);
 
 -- ------------------------------------------------------------
 -- USUARIOS ADMIN (login usuario/contraseña, hash bcrypt)
@@ -574,6 +586,17 @@ begin
 end;
 $$;
 
+-- ------------------------------------------------------------
+-- AJUSTES DE CONTENIDO DEL SITIO (clave → valor)
+--   p.ej. infografia_mochilas / infografia_maquillaje = URL de la
+--   imagen que se muestra al pie del catálogo de cada línea.
+-- ------------------------------------------------------------
+create table if not exists site_settings (
+  key text primary key,
+  value text,
+  updated_at timestamptz not null default now()
+);
+
 -- ============================================================
 -- STORAGE: bucket público para imágenes de productos
 -- ============================================================
@@ -597,3 +620,4 @@ alter table order_items       enable row level security;
 alter table purchase_orders   enable row level security;
 alter table purchase_items    enable row level security;
 alter table finance_movements enable row level security;
+alter table site_settings     enable row level security;

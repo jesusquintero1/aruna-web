@@ -4,11 +4,12 @@ import React, { useActionState, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useFormStatus } from "react-dom";
-import { saveProduct } from "@/lib/db/admin-actions";
+import { saveProduct, createVideoUploadUrl } from "@/lib/db/admin-actions";
 import { simbolosData } from "@/data/simbolos";
 import type { ProductoAdmin } from "@/lib/db/products";
 import type { Categoria } from "@/lib/db/categories";
-import { Loader2, Save, ArrowLeft } from "lucide-react";
+import type { LineaProducto } from "@/data/productos";
+import { Loader2, Save, ArrowLeft, Film, X } from "lucide-react";
 
 function SubmitBtn({ procesando }: { procesando: boolean }) {
   const { pending } = useFormStatus();
@@ -23,8 +24,8 @@ function SubmitBtn({ procesando }: { procesando: boolean }) {
 
 /**
  * Comprime una imagen en el navegador antes de subirla: la redimensiona a máx.
- * 1600px y la recodifica a JPEG. Así una foto de celular de 4–8 MB queda en
- * ~200–400 KB y nunca choca con el tope de request de Netlify (~6 MB), y
+ * 2000px y la recodifica a JPEG. Así una foto de celular de 4–8 MB queda en
+ * ~300–600 KB y nunca choca con el tope de request de Netlify (~6 MB), y
  * cualquier formato que el navegador sepa leer (PNG, WebP, AVIF, BMP…) se
  * normaliza a JPEG. Si el navegador no puede decodificarla, se envía tal cual.
  */
@@ -35,7 +36,7 @@ async function comprimirImagen(file: File): Promise<File> {
   } catch {
     return file;
   }
-  const MAX = 1600;
+  const MAX = 2000;
   const scale = Math.min(1, MAX / Math.max(bitmap.width, bitmap.height));
   const canvas = document.createElement("canvas");
   canvas.width = Math.round(bitmap.width * scale);
@@ -49,14 +50,61 @@ async function comprimirImagen(file: File): Promise<File> {
   return new File([blob], file.name.replace(/\.[^.]+$/, "") + ".jpg", { type: "image/jpeg" });
 }
 
+const MAX_VIDEO_MB = 50;
+
+/**
+ * Sube un video directo del navegador a Supabase Storage con una URL firmada
+ * que genera el servidor (los videos superan el tope de request de Netlify,
+ * así que no pueden viajar dentro del form). Devuelve la URL pública.
+ */
+async function subirVideo(file: File): Promise<{ url: string } | { error: string }> {
+  if (file.size > MAX_VIDEO_MB * 1024 * 1024) {
+    return { error: `"${file.name}" pesa más de ${MAX_VIDEO_MB} MB. Recórtalo o comprímelo antes de subirlo.` };
+  }
+  const res = await createVideoUploadUrl(file.name, file.type);
+  if ("error" in res) return { error: res.error };
+  const put = await fetch(res.uploadUrl, {
+    method: "PUT",
+    headers: { "Content-Type": file.type },
+    body: file,
+  });
+  if (!put.ok) return { error: `No se pudo subir "${file.name}" (HTTP ${put.status}).` };
+  return { url: res.publicUrl };
+}
+
 const field = "w-full bg-cream border border-cream-dark rounded-xl px-4 py-2.5 text-sm text-chocolate font-semibold focus:outline-none focus:border-caribe";
 const label = "text-xs font-black uppercase tracking-wide text-chocolate";
 
-export default function ProductForm({ producto, categorias }: { producto?: ProductoAdmin; categorias: Categoria[] }) {
+export default function ProductForm({ producto, categorias, lineaInicial }: { producto?: ProductoAdmin; categorias: Categoria[]; lineaInicial?: LineaProducto }) {
   const editing = Boolean(producto);
   const [previews, setPreviews] = useState<string[]>([]);
   const [procesando, setProcesando] = useState(false);
   const [state, formAction] = useActionState(saveProduct, undefined);
+  const [linea, setLinea] = useState<LineaProducto>(producto?.linea ?? lineaInicial ?? "mochilas");
+  const [videosSubidos, setVideosSubidos] = useState<{ url: string; nombre: string }[]>([]);
+  const [subiendoVideo, setSubiendoVideo] = useState(false);
+  const [videoError, setVideoError] = useState<string | null>(null);
+
+  // El dropdown de categorías solo muestra las de la línea elegida.
+  const categoriasLinea = categorias.filter((c) => c.linea === linea);
+
+  const onVideos = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target;
+    const files = Array.from(input.files || []);
+    if (files.length === 0) return;
+    setVideoError(null);
+    setSubiendoVideo(true);
+    try {
+      for (const f of files) {
+        const r = await subirVideo(f);
+        if ("error" in r) { setVideoError(r.error); continue; }
+        setVideosSubidos((prev) => [...prev, { url: r.url, nombre: f.name }]);
+      }
+    } finally {
+      setSubiendoVideo(false);
+      input.value = ""; // el video ya está en Storage; el form solo envía su URL
+    }
+  };
 
   // Comprime las fotos al seleccionarlas y reemplaza los archivos del input,
   // para que el form envíe las versiones livianas.
@@ -157,16 +205,66 @@ export default function ProductForm({ producto, categorias }: { producto?: Produ
               </div>
             )}
           </div>
+
+          {/* Videos existentes */}
+          {editing && (producto!.videos?.length ?? 0) > 0 && (
+            <div className="space-y-2">
+              <label className={label}>Videos actuales (desmarca para eliminar)</label>
+              <div className="flex flex-wrap gap-3">
+                {producto!.videos!.map((url) => (
+                  <label key={url} className="relative w-32 rounded-xl overflow-hidden border border-cream-dark cursor-pointer block">
+                    <video src={url} className="w-32 h-20 object-cover bg-carbon" muted playsInline preload="metadata" />
+                    <input type="checkbox" name="keep_videos" value={url} defaultChecked className="absolute top-1 left-1 w-4 h-4 accent-caribe" />
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Videos nuevos: suben directo a Storage al seleccionarlos */}
+          <div className="space-y-1.5">
+            <label className={label}>Videos (opcional)</label>
+            <input type="file" accept="video/mp4,video/webm,video/quicktime" multiple onChange={onVideos} disabled={subiendoVideo} className={field + " file:mr-3 file:rounded-lg file:border-0 file:bg-chocolate file:text-white file:px-3 file:py-1 file:font-bold file:text-xs"} />
+            <p className="text-[11px] text-chocolate-light">MP4, WebM o MOV, máx. {MAX_VIDEO_MB} MB por video. Se suben al instante, antes de guardar.</p>
+            {subiendoVideo && (
+              <p className="text-xs font-bold text-caribe flex items-center gap-2"><Loader2 className="w-3.5 h-3.5 animate-spin" /> Subiendo video…</p>
+            )}
+            {videoError && (
+              <p className="text-xs font-bold text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{videoError}</p>
+            )}
+            {videosSubidos.length > 0 && (
+              <div className="space-y-1 pt-1">
+                {videosSubidos.map((v) => (
+                  <div key={v.url} className="flex items-center gap-2 text-xs font-bold text-chocolate bg-cream rounded-lg px-3 py-2">
+                    <Film className="w-3.5 h-3.5 text-caribe flex-shrink-0" />
+                    <span className="truncate flex-grow">{v.nombre}</span>
+                    <button type="button" aria-label="Quitar video" onClick={() => setVideosSubidos((prev) => prev.filter((x) => x.url !== v.url))} className="text-chocolate-light hover:text-flamenco">
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                    <input type="hidden" name="videos_urls" value={v.url} />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Columna lateral */}
         <div className="space-y-5">
           <div className="bg-white border border-cream-dark rounded-2xl p-6 space-y-5">
             <div className="space-y-1.5">
+              <label className={label}>Línea</label>
+              <select name="linea" value={linea} onChange={(e) => setLinea(e.target.value as LineaProducto)} className={field}>
+                <option value="mochilas">Mochilas Wayuu</option>
+                <option value="maquillaje">Maquillaje</option>
+              </select>
+            </div>
+
+            <div className="space-y-1.5">
               <label className={label}>Categoría</label>
               <select name="categoria_id" defaultValue={producto?.categoriaId ?? ""} className={field}>
                 <option value="">— Sin categoría —</option>
-                {categorias.map((c) => (
+                {categoriasLinea.map((c) => (
                   <option key={c.id} value={c.id}>{c.nombre}</option>
                 ))}
               </select>
@@ -184,6 +282,14 @@ export default function ProductForm({ producto, categorias }: { producto?: Produ
             <label className="flex items-center gap-2.5 cursor-pointer">
               <input type="checkbox" name="destacado" defaultChecked={producto?.destacado} className="w-5 h-5 accent-gold-lux" />
               <span className="text-sm font-bold text-chocolate">Destacar en la home</span>
+            </label>
+
+            <label className="flex items-start gap-2.5 cursor-pointer">
+              <input type="checkbox" name="publicado" defaultChecked={producto ? producto.publicado : false} className="w-5 h-5 accent-cactus mt-0.5" />
+              <span className="text-sm font-bold text-chocolate">
+                Publicado
+                <span className="block text-[11px] font-semibold text-chocolate-light">Si está desmarcado queda como borrador: no aparece en la tienda.</span>
+              </span>
             </label>
           </div>
 

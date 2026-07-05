@@ -13,6 +13,7 @@ export const MAX_QTY_ONLINE = 100;
 export const MAX_QTY_POS = 10_000;
 
 export const SIMBOLOS = ["colibri", "flamenco", "cardenal", "cactus", "lirios", "delfines"] as const;
+export const LINEAS = ["mochilas", "maquillaje"] as const;
 
 const money = z.number().int().min(0).max(MAX_MONEY);
 const shortText = z.string().trim().max(120);
@@ -81,6 +82,7 @@ export const productSchema = z.object({
   precio_anterior: money.nullable(),
   stock: z.number().int().min(0).max(MAX_STOCK),
   simbolo: z.enum(SIMBOLOS),
+  linea: z.enum(LINEAS),
 });
 
 // ------------------------------------------------------------

@@ -23,8 +23,12 @@ export default async function AdminCategorias() {
         </p>
       )}
 
-      <form action={createCategory} className="flex gap-2 bg-white border border-cream-dark rounded-2xl p-4">
+      <form action={createCategory} className="flex flex-wrap gap-2 bg-white border border-cream-dark rounded-2xl p-4">
         <input name="nombre" required placeholder="Nombre de la categoría" className="flex-grow bg-cream border border-cream-dark rounded-xl px-4 py-2.5 text-sm text-chocolate font-semibold focus:outline-none focus:border-caribe" />
+        <select name="linea" className="bg-cream border border-cream-dark rounded-xl px-3 py-2.5 text-sm text-chocolate font-semibold focus:outline-none focus:border-caribe">
+          <option value="mochilas">Mochilas</option>
+          <option value="maquillaje">Maquillaje</option>
+        </select>
         <button type="submit" className="btn-primary px-5 py-2.5 text-xs uppercase tracking-wider"><Plus className="w-4 h-4" /> Añadir</button>
       </form>
 

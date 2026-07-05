@@ -1,22 +1,42 @@
 import Link from "next/link";
 import { getProductsAdmin } from "@/lib/db/products";
 import { getOrders } from "@/lib/db/orders";
-import { getFinanceSummary, getFinanceMovements } from "@/lib/db/finance";
+import { getFinanceSummary, getFinanceMovements, getVentasPagadasPorLinea } from "@/lib/db/finance";
 import { isSupabaseConfigured } from "@/lib/supabase/server";
 import { formatPrice } from "@/lib/utils";
 import FinancePanel from "@/components/admin/FinancePanel";
-import { Package, ShoppingBag, TrendingUp, AlertTriangle, Plus, Calculator, Wallet, Boxes, Coins } from "lucide-react";
+import type { LineaProducto } from "@/data/productos";
+import { Package, ShoppingBag, TrendingUp, AlertTriangle, Plus, Calculator, Wallet, Boxes, Coins, ShoppingBasket, Sparkles } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
-  const [productos, pedidos, fin, movimientos] = await Promise.all([
+  const [productos, pedidos, fin, movimientos, ventasPorLinea] = await Promise.all([
     getProductsAdmin(),
     getOrders(),
     getFinanceSummary(),
     getFinanceMovements(),
+    getVentasPagadasPorLinea(),
   ]);
   const configured = isSupabaseConfigured();
+
+  // Desglose por línea (mochilas vs maquillaje)
+  const lineas = (["mochilas", "maquillaje"] as LineaProducto[]).map((linea) => {
+    const prods = productos.filter((p) => p.linea === linea);
+    const unidades = prods.reduce((s, p) => s + Math.max(0, p.stock), 0);
+    const capital = prods.reduce((s, p) => s + Math.max(0, p.stock) * p.costo, 0);
+    const valorVenta = prods.reduce((s, p) => s + Math.max(0, p.stock) * p.precio, 0);
+    return {
+      linea,
+      nombre: linea === "maquillaje" ? "Maquillaje" : "Mochilas Wayuu",
+      icon: linea === "maquillaje" ? Sparkles : ShoppingBasket,
+      productos: prods.length,
+      unidades,
+      capital,
+      valorVenta,
+      ventas: ventasPorLinea[linea],
+    };
+  });
 
   // Unidades disponibles = suma del stock de todas las referencias (NO el número
   // de productos/categorías). Una referencia con 5 unidades cuenta como 5.
@@ -75,6 +95,28 @@ export default async function AdminDashboard() {
             <p className="text-xs text-chocolate font-bold uppercase tracking-wide">{s.label}</p>
             <p className="text-[11px] text-chocolate-light">{s.hint}</p>
           </div>
+        ))}
+      </div>
+
+      {/* Desglose por línea: mochilas vs maquillaje */}
+      <div className="grid md:grid-cols-2 gap-4">
+        {lineas.map((l) => (
+          <Link key={l.linea} href={`/admin/${l.linea}`} className="bg-white border border-cream-dark rounded-2xl p-5 hover:border-caribe transition-colors block">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <l.icon className="w-5 h-5 text-gold-deep" />
+                <h2 className="font-title font-extrabold text-chocolate">{l.nombre}</h2>
+              </div>
+              <span className="text-xs font-bold text-caribe uppercase tracking-wide">Ver línea →</span>
+            </div>
+            <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
+              <div className="flex justify-between"><span className="text-chocolate-light">Productos</span><b className="text-chocolate">{l.productos}</b></div>
+              <div className="flex justify-between"><span className="text-chocolate-light">Unidades</span><b className="text-chocolate">{l.unidades}</b></div>
+              <div className="flex justify-between"><span className="text-chocolate-light">Capital</span><b className="text-chocolate">{formatPrice(l.capital)}</b></div>
+              <div className="flex justify-between"><span className="text-chocolate-light">Si vendo todo</span><b className="text-chocolate">{formatPrice(l.valorVenta)}</b></div>
+              <div className="flex justify-between col-span-2 pt-1 border-t border-cream-dark/60"><span className="text-chocolate-light">Ventas pagadas</span><b className="text-cactus">{formatPrice(l.ventas)}</b></div>
+            </div>
+          </Link>
         ))}
       </div>
 

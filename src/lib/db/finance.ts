@@ -1,5 +1,6 @@
 import "server-only";
 import { getSupabase } from "@/lib/supabase/server";
+import type { LineaProducto } from "@/data/productos";
 
 export type MovimientoTipo = "inversion" | "gasto" | "ingreso";
 
@@ -29,6 +30,30 @@ export interface FinanceSummary {
   caja: number;             // efectivo estimado disponible
 
   patrimonio: number;       // caja + capital (valor total del negocio al costo)
+}
+
+/**
+ * Ventas pagadas/enviadas desglosadas por línea de producto.
+ * Se calcula desde order_items (join a products.linea); los ítems cuyo
+ * producto fue borrado (product_id null) se agrupan en 'mochilas' por defecto.
+ * Nota: usa subtotales de ítems, no descuentos de orden, así que puede
+ * diferir levemente del total de la orden cuando hay descuentos.
+ */
+export async function getVentasPagadasPorLinea(): Promise<Record<LineaProducto, number>> {
+  const out: Record<LineaProducto, number> = { mochilas: 0, maquillaje: 0 };
+  const db = getSupabase();
+  if (!db) return out;
+  const { data, error } = await db
+    .from("order_items")
+    .select("subtotal, orders!inner(estado), products(linea)");
+  if (error || !data) return out;
+  for (const row of data as unknown as Array<{ subtotal: number; orders: { estado: string }; products: { linea: LineaProducto | null } | null }>) {
+    const estado = row.orders?.estado;
+    if (estado !== "pagado" && estado !== "enviado") continue;
+    const linea = row.products?.linea ?? "mochilas";
+    out[linea] += row.subtotal ?? 0;
+  }
+  return out;
 }
 
 export async function getFinanceMovements(): Promise<FinanceMovement[]> {

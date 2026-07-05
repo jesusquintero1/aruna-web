@@ -16,6 +16,8 @@ const csp = [
   `script-src 'self' 'unsafe-inline' https://*.googletagmanager.com https://connect.facebook.net`,
   "style-src 'self' 'unsafe-inline'",
   `img-src 'self' data: https://*.supabase.co https://images.unsplash.com ${GA} https://*.facebook.com`,
+  // Videos de producto servidos desde Supabase Storage
+  "media-src 'self' https://*.supabase.co",
   "font-src 'self'",
   `connect-src 'self' https://*.supabase.co ${GA} https://*.facebook.com`,
   "frame-ancestors 'none'",

@@ -20,18 +20,24 @@
  *   - `simbolo`: "colibri" | "flamenco" | "cardenal" | "cactus" | "lirios" | "delfines"
  */
 
+export type LineaProducto = "mochilas" | "maquillaje";
+
 export interface Producto {
   id: string;
   nombre: string;
   precio: number;
   precioAnterior?: number;
   imagenes: string[];
+  /** Videos del producto (URLs públicas). Opcional: los hardcodeados no tienen. */
+  videos?: string[];
   descripcion: string;
   colores: string[];
   categoria: string;
   disponible: boolean;
   destacado: boolean;
   simbolo: "colibri" | "flamenco" | "cardenal" | "cactus" | "lirios" | "delfines";
+  /** Línea de producto. Los hardcodeados son todos mochilas. */
+  linea?: LineaProducto;
 }
 
 export const productos: Producto[] = [

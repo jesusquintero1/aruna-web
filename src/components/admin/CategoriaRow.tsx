@@ -19,6 +19,10 @@ export default function CategoriaRow({ categoria }: { categoria: Categoria }) {
       >
         <input type="hidden" name="id" value={categoria.id} />
         <input name="nombre" defaultValue={categoria.nombre} required className={`${field} flex-grow`} placeholder="Nombre" />
+        <select name="linea" defaultValue={categoria.linea} className={field} title="Línea de producto">
+          <option value="mochilas">Mochilas</option>
+          <option value="maquillaje">Maquillaje</option>
+        </select>
         <input name="orden" type="number" defaultValue={categoria.orden} className={`${field} w-20`} title="Orden (menor aparece primero)" />
         <button type="submit" className="p-2 text-cactus hover:bg-cactus/10 rounded-lg" aria-label="Guardar"><Check className="w-4 h-4" /></button>
         <button type="button" onClick={() => setEditing(false)} className="p-2 text-chocolate-light hover:bg-cream rounded-lg" aria-label="Cancelar"><X className="w-4 h-4" /></button>
@@ -30,7 +34,9 @@ export default function CategoriaRow({ categoria }: { categoria: Categoria }) {
     <div className="flex items-center justify-between p-4">
       <span className="flex items-center gap-2.5 font-bold text-chocolate">
         <Tags className="w-4 h-4 text-caribe" /> {categoria.nombre}
-        <span className="text-[10px] text-chocolate-light font-normal">· orden {categoria.orden}</span>
+        <span className="text-[10px] text-chocolate-light font-normal">
+          · {categoria.linea === "maquillaje" ? "Maquillaje" : "Mochilas"} · orden {categoria.orden}
+        </span>
       </span>
       <div className="flex items-center gap-1">
         <button onClick={() => setEditing(true)} className="p-2 text-chocolate-light hover:text-caribe rounded-lg hover:bg-cream" aria-label="Editar">
