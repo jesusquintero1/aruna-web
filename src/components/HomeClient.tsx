@@ -19,17 +19,25 @@ interface HomeClientProps {
   disponibles: number;
 }
 
+/** Respaldo si no hay ningún producto destacado publicado. */
+const fallbackSlides = [
+  { img: "/images/mochila_flamenco.png", href: "/catalogo", nombre: "Mochila Wayuu Arüna" },
+  { img: "/images/mochila_cardenal.png", href: "/catalogo", nombre: "Mochila Wayuu Arüna" },
+  { img: "/images/mochila_iguaraya.png", href: "/catalogo", nombre: "Mochila Wayuu Arüna" },
+];
+
 export default function HomeClient({ featured, disponibles }: HomeClientProps) {
-  const heroSlides = [
-    { img: "/images/mochila_flamenco.png" },
-    { img: "/images/mochila_cardenal.png" },
-    { img: "/images/mochila_iguaraya.png" },
-  ];
+  // El carrusel de portada muestra los productos marcados como "Destacar en la
+  // home" en el admin (solo publicados). Cada slide enlaza a su producto.
+  const heroSlides = featured.length > 0
+    ? featured.slice(0, 5).map((p) => ({ img: p.imagenes[0], href: `/producto/${p.id}`, nombre: p.nombre }))
+    : fallbackSlides;
   const [slide, setSlide] = useState(0);
+  const slideActual = heroSlides[slide % heroSlides.length];
   useEffect(() => {
     const t = setInterval(() => setSlide((s) => (s + 1) % heroSlides.length), 4500);
     return () => clearInterval(t);
-  }, []);
+  }, [heroSlides.length]);
 
   const [review, setReview] = useState(0);
   useEffect(() => {
@@ -137,11 +145,11 @@ export default function HomeClient({ featured, disponibles }: HomeClientProps) {
                 transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
                 className="absolute inset-0"
               >
-                <div className="relative w-full h-full rounded-[40px] overflow-hidden border border-gold-lux/30 shadow-2xl">
+                <Link href={slideActual.href} className="block relative w-full h-full rounded-[40px] overflow-hidden border border-gold-lux/30 shadow-2xl">
                   <div className="absolute inset-0 animate-zoomBg">
                     <Image
-                      src={heroSlides[slide].img}
-                      alt="Mochila Wayuu Arüna de alta artesanía"
+                      src={slideActual.img}
+                      alt={slideActual.nombre}
                       fill
                       className="object-cover"
                       sizes="(max-width: 1024px) 100vw, 50vw"
@@ -149,7 +157,7 @@ export default function HomeClient({ featured, disponibles }: HomeClientProps) {
                     />
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-t from-carbon/50 via-transparent to-transparent" />
-                </div>
+                </Link>
               </motion.div>
             </AnimatePresence>
 
