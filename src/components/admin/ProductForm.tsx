@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useActionState, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useFormStatus } from "react-dom";
@@ -10,14 +10,43 @@ import type { ProductoAdmin } from "@/lib/db/products";
 import type { Categoria } from "@/lib/db/categories";
 import { Loader2, Save, ArrowLeft } from "lucide-react";
 
-function SubmitBtn() {
+function SubmitBtn({ procesando }: { procesando: boolean }) {
   const { pending } = useFormStatus();
+  const busy = pending || procesando;
   return (
-    <button type="submit" disabled={pending} className="btn-primary px-7 py-3 text-sm uppercase tracking-wider disabled:opacity-60">
-      {pending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-      {pending ? "Guardando…" : "Guardar producto"}
+    <button type="submit" disabled={busy} className="btn-primary px-7 py-3 text-sm uppercase tracking-wider disabled:opacity-60">
+      {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+      {pending ? "Guardando…" : procesando ? "Procesando fotos…" : "Guardar producto"}
     </button>
   );
+}
+
+/**
+ * Comprime una imagen en el navegador antes de subirla: la redimensiona a máx.
+ * 1600px y la recodifica a JPEG. Así una foto de celular de 4–8 MB queda en
+ * ~200–400 KB y nunca choca con el tope de request de Netlify (~6 MB), y
+ * cualquier formato que el navegador sepa leer (PNG, WebP, AVIF, BMP…) se
+ * normaliza a JPEG. Si el navegador no puede decodificarla, se envía tal cual.
+ */
+async function comprimirImagen(file: File): Promise<File> {
+  let bitmap: ImageBitmap;
+  try {
+    bitmap = await createImageBitmap(file);
+  } catch {
+    return file;
+  }
+  const MAX = 1600;
+  const scale = Math.min(1, MAX / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(bitmap.width * scale);
+  canvas.height = Math.round(bitmap.height * scale);
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return file;
+  ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  bitmap.close();
+  const blob = await new Promise<Blob | null>((res) => canvas.toBlob(res, "image/jpeg", 0.82));
+  if (!blob || blob.size >= file.size) return file;
+  return new File([blob], file.name.replace(/\.[^.]+$/, "") + ".jpg", { type: "image/jpeg" });
 }
 
 const field = "w-full bg-cream border border-cream-dark rounded-xl px-4 py-2.5 text-sm text-chocolate font-semibold focus:outline-none focus:border-caribe";
@@ -26,10 +55,25 @@ const label = "text-xs font-black uppercase tracking-wide text-chocolate";
 export default function ProductForm({ producto, categorias }: { producto?: ProductoAdmin; categorias: Categoria[] }) {
   const editing = Boolean(producto);
   const [previews, setPreviews] = useState<string[]>([]);
+  const [procesando, setProcesando] = useState(false);
+  const [state, formAction] = useActionState(saveProduct, undefined);
 
-  const onFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setPreviews(files.map((f) => URL.createObjectURL(f)));
+  // Comprime las fotos al seleccionarlas y reemplaza los archivos del input,
+  // para que el form envíe las versiones livianas.
+  const onFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target;
+    const files = Array.from(input.files || []);
+    if (files.length === 0) { setPreviews([]); return; }
+    setProcesando(true);
+    try {
+      const comprimidas = await Promise.all(files.map(comprimirImagen));
+      const dt = new DataTransfer();
+      comprimidas.forEach((f) => dt.items.add(f));
+      input.files = dt.files;
+      setPreviews(comprimidas.map((f) => URL.createObjectURL(f)));
+    } finally {
+      setProcesando(false);
+    }
   };
 
   return (
@@ -39,7 +83,7 @@ export default function ProductForm({ producto, categorias }: { producto?: Produ
       </Link>
       <h1 className="font-lux font-bold text-3xl text-chocolate">{editing ? "Editar producto" : "Nuevo producto"}</h1>
 
-      <form action={saveProduct} className="grid lg:grid-cols-3 gap-6">
+      <form action={formAction} className="grid lg:grid-cols-3 gap-6">
         {/* Columna principal */}
         <div className="lg:col-span-2 space-y-5 bg-white border border-cream-dark rounded-2xl p-6">
           {editing && <input type="hidden" name="id" value={producto!.id} />}
@@ -101,6 +145,7 @@ export default function ProductForm({ producto, categorias }: { producto?: Produ
           <div className="space-y-1.5">
             <label className={label}>{editing ? "Añadir imágenes" : "Imágenes"}</label>
             <input name="imagenes" type="file" accept="image/*" multiple onChange={onFiles} className={field + " file:mr-3 file:rounded-lg file:border-0 file:bg-caribe file:text-white file:px-3 file:py-1 file:font-bold file:text-xs"} />
+            <p className="text-[11px] text-chocolate-light">Puedes subir fotos de cualquier tamaño: se comprimen automáticamente antes de enviarse.</p>
             {previews.length > 0 && (
               <div className="flex flex-wrap gap-3 pt-2">
                 {previews.map((src, i) => (
@@ -142,7 +187,13 @@ export default function ProductForm({ producto, categorias }: { producto?: Produ
             </label>
           </div>
 
-          <SubmitBtn />
+          {state?.error && (
+            <p className="text-sm font-bold text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+              {state.error}
+            </p>
+          )}
+
+          <SubmitBtn procesando={procesando} />
         </div>
       </form>
     </div>
