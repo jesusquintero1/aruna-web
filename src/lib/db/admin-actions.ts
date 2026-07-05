@@ -44,14 +44,16 @@ function revalidateStore() {
 // ============================================================
 // PRODUCTOS
 // ============================================================
-export async function saveProduct(formData: FormData): Promise<void> {
+export type SaveProductState = { error: string } | undefined;
+
+export async function saveProduct(_prev: SaveProductState, formData: FormData): Promise<SaveProductState> {
   await verifySession();
   const db = getSupabase();
-  if (!db) throw new Error("Supabase no está configurado. No se puede guardar.");
+  if (!db) return { error: "Supabase no está configurado. No se puede guardar." };
 
   const editingId = String(formData.get("id") || "").trim();
   const nombre = String(formData.get("nombre") || "").trim();
-  if (!nombre) throw new Error("El nombre es obligatorio.");
+  if (!nombre) return { error: "El nombre es obligatorio." };
 
   const id = editingId || `${slugify(nombre)}-${Math.random().toString(36).slice(2, 6)}`;
 
@@ -70,14 +72,18 @@ export async function saveProduct(formData: FormData): Promise<void> {
   // Validación de forma y topes (precios/stock/símbolo).
   const v = productSchema.safeParse({ nombre, precio, costo, precio_anterior, stock, simbolo });
   if (!v.success) {
-    const msg = v.error.issues[0]?.message || "Datos del producto inválidos.";
-    throw new Error(msg);
+    return { error: v.error.issues[0]?.message || "Datos del producto inválidos." };
   }
 
   // Imágenes existentes que se conservan + nuevas subidas
   const keep = formData.getAll("keep_imagenes").map(String).filter(Boolean);
   const files = formData.getAll("imagenes").filter((f): f is File => f instanceof File);
-  const nuevas = await uploadImages(db, id, files);
+  let nuevas: string[];
+  try {
+    nuevas = await uploadImages(db, id, files);
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Error al subir las imágenes." };
+  }
   const imagenes = [...keep, ...nuevas];
 
   const row = {
@@ -86,7 +92,7 @@ export async function saveProduct(formData: FormData): Promise<void> {
   };
 
   const { error } = await db.from("products").upsert(row, { onConflict: "id" });
-  if (error) throw new Error(error.message);
+  if (error) return { error: error.message };
 
   revalidateStore();
   redirect("/admin/productos");
