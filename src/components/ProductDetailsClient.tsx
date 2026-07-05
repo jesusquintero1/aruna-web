@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Producto } from "@/data/productos";
 import { formatPrice } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
-import { ShoppingCart, ArrowLeft, Shield, Sparkles, HeartHandshake, Truck, Check, Info } from "lucide-react";
+import { ShoppingCart, ArrowLeft, Shield, Sparkles, HeartHandshake, Truck, Check, Info, Play } from "lucide-react";
 import { motion } from "framer-motion";
 import { WayuuDivider } from "@/components/FaunaFloraIcons";
 
@@ -15,9 +15,23 @@ interface ProductDetailsClientProps {
   productosRelacionados: Producto[];
 }
 
+/** La galería mezcla imágenes y videos del producto. */
+interface Media {
+  tipo: "imagen" | "video";
+  src: string;
+}
+
 export default function ProductDetailsClient({ producto, productosRelacionados }: ProductDetailsClientProps) {
-  const [activeImage, setActiveImage] = useState(producto.imagenes[0]);
+  const medias: Media[] = [
+    ...producto.imagenes.map((src): Media => ({ tipo: "imagen", src })),
+    ...(producto.videos ?? []).map((src): Media => ({ tipo: "video", src })),
+  ];
+  const [activeMedia, setActiveMedia] = useState<Media>(medias[0]);
   const { addToCart } = useCart();
+
+  // Las secciones de tejido (capacidad, artesana, tintes) solo aplican a mochilas.
+  const esMaquillaje = producto.linea === "maquillaje";
+  const volverHref = esMaquillaje ? "/maquillaje" : "/catalogo";
 
   // Determinar dinámicamente el tamaño y capacidad de la mochila (Fiel a la UX de Ben & Frank)
   const isMini = producto.id.toLowerCase().includes("mini") || producto.id.toLowerCase().includes("sususu");
@@ -78,7 +92,7 @@ export default function ProductDetailsClient({ producto, productosRelacionados }
       {/* Botón Volver */}
       <div className="text-left">
         <Link
-          href="/catalogo"
+          href={volverHref}
           className="inline-flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-chocolate-light hover:text-terracotta transition-colors group"
         >
           <ArrowLeft className="w-4 h-4 transform group-hover:-translate-x-1 transition-transform" />
@@ -92,14 +106,24 @@ export default function ProductDetailsClient({ producto, productosRelacionados }
         {/* COLUMNA IZQUIERDA: Galería de Imágenes (Boutique Framed) */}
         <div className="lg:col-span-7 space-y-4">
           <div className="relative aspect-[4/5] bg-surface border border-cream-dark/35 rounded-[24px] overflow-hidden shadow-sm">
-            <Image
-              src={activeImage}
-              alt={producto.nombre}
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 60vw"
-              priority
-            />
+            {activeMedia.tipo === "video" ? (
+              <video
+                key={activeMedia.src}
+                src={activeMedia.src}
+                controls
+                playsInline
+                className="absolute inset-0 w-full h-full object-contain bg-carbon"
+              />
+            ) : (
+              <Image
+                src={activeMedia.src}
+                alt={producto.nombre}
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 60vw"
+                priority
+              />
+            )}
             {/* Badges */}
             <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
               {producto.disponible ? (
@@ -114,24 +138,33 @@ export default function ProductDetailsClient({ producto, productosRelacionados }
             </div>
           </div>
 
-          {/* Thumbnails */}
-          {producto.imagenes.length > 1 && (
+          {/* Thumbnails (imágenes + videos) */}
+          {medias.length > 1 && (
             <div className="flex space-x-3 overflow-x-auto pb-2 no-scrollbar">
-              {producto.imagenes.map((img, idx) => (
+              {medias.map((m, idx) => (
                 <button
                   key={idx}
-                  onClick={() => setActiveImage(img)}
+                  onClick={() => setActiveMedia(m)}
                   className={`relative w-20 h-20 bg-surface rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 ${
-                    activeImage === img ? "border-terracotta shadow" : "border-cream-dark/30 hover:border-cream-dark"
+                    activeMedia.src === m.src ? "border-terracotta shadow" : "border-cream-dark/30 hover:border-cream-dark"
                   }`}
                 >
-                  <Image
-                    src={img}
-                    alt={`${producto.nombre} thumbnail ${idx + 1}`}
-                    fill
-                    className="object-cover"
-                    sizes="80px"
-                  />
+                  {m.tipo === "video" ? (
+                    <>
+                      <video src={m.src} muted playsInline preload="metadata" className="absolute inset-0 w-full h-full object-cover bg-carbon" />
+                      <span className="absolute inset-0 flex items-center justify-center bg-carbon/30">
+                        <Play className="w-6 h-6 text-white fill-current" />
+                      </span>
+                    </>
+                  ) : (
+                    <Image
+                      src={m.src}
+                      alt={`${producto.nombre} thumbnail ${idx + 1}`}
+                      fill
+                      className="object-cover"
+                      sizes="80px"
+                    />
+                  )}
                 </button>
               ))}
             </div>
@@ -182,7 +215,8 @@ export default function ProductDetailsClient({ producto, productosRelacionados }
             </p>
           </div>
 
-          {/* ================= A. PALETA DE HILOS Y TINTES (Sajú Style) ================= */}
+          {/* ================= A. PALETA DE HILOS Y TINTES (Sajú Style — solo mochilas) ================= */}
+          {!esMaquillaje && (
           <div className="space-y-3 bg-surface p-5 rounded-[20px] border border-cream-dark/25">
             <h4 className="font-title font-bold text-xs text-chocolate uppercase tracking-wider flex items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-terracotta" />
@@ -205,14 +239,15 @@ export default function ProductDetailsClient({ producto, productosRelacionados }
               ))}
             </div>
           </div>
+          )}
 
           {/* Señales de Confianza del Producto */}
           <div className="grid grid-cols-2 gap-4 py-4 border-y border-cream-dark/30">
             <div className="flex items-start space-x-3 text-[11px] font-semibold text-chocolate-light">
               <Sparkles className="w-4.5 h-4.5 text-terracotta flex-shrink-0 mt-0.5" />
               <div>
-                <h4 className="font-bold text-chocolate uppercase tracking-wide text-[10px]">Tejido de Autor</h4>
-                <p className="text-[10px]">Hecho a un solo hilo</p>
+                <h4 className="font-bold text-chocolate uppercase tracking-wide text-[10px]">{esMaquillaje ? "Selección Arüna" : "Tejido de Autor"}</h4>
+                <p className="text-[10px]">{esMaquillaje ? "Calidad garantizada" : "Hecho a un solo hilo"}</p>
               </div>
             </div>
             <div className="flex items-start space-x-3 text-[11px] font-semibold text-chocolate-light">
@@ -232,8 +267,8 @@ export default function ProductDetailsClient({ producto, productosRelacionados }
             <div className="flex items-start space-x-3 text-[11px] font-semibold text-chocolate-light">
               <Shield className="w-4.5 h-4.5 text-cardenal flex-shrink-0 mt-0.5" />
               <div>
-                <h4 className="font-bold text-chocolate uppercase tracking-wide text-[10px]">Masterpiece Única</h4>
-                <p className="text-[10px]">Nunca habrá otra igual</p>
+                <h4 className="font-bold text-chocolate uppercase tracking-wide text-[10px]">{esMaquillaje ? "Producto Original" : "Masterpiece Única"}</h4>
+                <p className="text-[10px]">{esMaquillaje ? "Sellado de fábrica" : "Nunca habrá otra igual"}</p>
               </div>
             </div>
           </div>
@@ -260,7 +295,8 @@ export default function ProductDetailsClient({ producto, productosRelacionados }
         </div>
       </div>
 
-      {/* ================= B. VISUALIZADOR DE TAMAÑO & CAPACIDAD (Ben & Frank Style) ================= */}
+      {/* ================= B. VISUALIZADOR DE TAMAÑO & CAPACIDAD (Ben & Frank Style — solo mochilas) ================= */}
+      {!esMaquillaje && (
       <section className="bg-surface border border-cream-dark/30 rounded-[24px] p-6 sm:p-8 space-y-6">
         <div className="flex items-start gap-3 text-left">
           <div className="p-2.5 bg-terracotta/10 rounded-xl">
@@ -304,8 +340,10 @@ export default function ProductDetailsClient({ producto, productosRelacionados }
           ))}
         </div>
       </section>
+      )}
 
-      {/* ================= C. MAESTRA ARTESANA BIOGRAFÍA (Mercedes Salazar Storytelling) ================= */}
+      {/* ================= C. MAESTRA ARTESANA BIOGRAFÍA (Mercedes Salazar Storytelling — solo mochilas) ================= */}
+      {!esMaquillaje && (
       <section className="bg-surface border border-cream-dark/30 rounded-[24px] overflow-hidden grid grid-cols-1 md:grid-cols-12 gap-6 items-center text-left">
         <div className="md:col-span-4 relative aspect-[4/5] md:aspect-square w-full h-full bg-cream-dark/20 min-h-[220px]">
           <Image
@@ -336,13 +374,14 @@ export default function ProductDetailsClient({ producto, productosRelacionados }
           <WayuuDivider className="opacity-15 max-w-xs pt-2" />
         </div>
       </section>
+      )}
 
       {/* 4. PRODUCTOS RELACIONADOS */}
       {productosRelacionados.length > 0 && (
         <div className="space-y-8 pt-12 border-t border-cream-dark/30">
           <div className="text-center md:text-left space-y-1">
             <span className="text-[10px] uppercase font-black tracking-widest text-terracotta block">Sugerencias exclusivas</span>
-            <h2 className="font-title font-black text-2xl sm:text-3xl text-chocolate">Otras Mochilas con Alma</h2>
+            <h2 className="font-title font-black text-2xl sm:text-3xl text-chocolate">{esMaquillaje ? "También te puede gustar" : "Otras Mochilas con Alma"}</h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

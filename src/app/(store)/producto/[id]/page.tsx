@@ -26,8 +26,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const formattedPrice = formatPrice(producto.precio);
-  const title = `Mochila Wayuu ${producto.nombre} - Compra Original`;
-  const description = `${producto.nombre} tejida a mano en La Guajira por artesanas locales (${formattedPrice}). ${producto.descripcion.substring(0, 120)}...`;
+  const esMaquillaje = producto.linea === "maquillaje";
+  const title = esMaquillaje
+    ? `${producto.nombre} - Maquillaje ARÜNA`
+    : `Mochila Wayuu ${producto.nombre} - Compra Original`;
+  const description = esMaquillaje
+    ? `${producto.nombre} (${formattedPrice}). ${producto.descripcion.substring(0, 120)}...`
+    : `${producto.nombre} tejida a mano en La Guajira por artesanas locales (${formattedPrice}). ${producto.descripcion.substring(0, 120)}...`;
 
   return {
     title,
@@ -74,8 +79,8 @@ export default async function ProductoDetallePage({ params }: PageProps) {
     notFound();
   }
 
-  // Obtener productos relacionados (excluyendo el actual)
-  const productosRelacionados = await getRelatedProducts(producto.id);
+  // Obtener productos relacionados de la misma línea (excluyendo el actual)
+  const productosRelacionados = await getRelatedProducts(producto.id, producto.linea ?? "mochilas");
 
   // Schema.org para rastreadores de búsqueda
   const jsonLd = getProductSchema(producto);

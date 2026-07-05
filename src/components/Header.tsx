@@ -23,6 +23,7 @@ export default function Header() {
   const navLinks = [
     { name: "Inicio", path: "/" },
     { name: "Catálogo", path: "/catalogo" },
+    { name: "Maquillaje", path: "/maquillaje" },
     { name: "Historia", path: "/historia" },
     { name: "Blog", path: "/blog" },
   ];

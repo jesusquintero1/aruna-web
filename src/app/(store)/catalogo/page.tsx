@@ -1,8 +1,10 @@
 import React from "react";
 import type { Metadata } from "next";
 import ProductGrid from "@/components/ProductGrid";
+import InfografiaFooter from "@/components/InfografiaFooter";
 import { WayuuDivider, LirioIcon, DelfinIcon } from "@/components/FaunaFloraIcons";
 import { getProducts } from "@/lib/db/products";
+import { getSetting } from "@/lib/db/settings";
 
 export const metadata: Metadata = {
   title: "Catálogo de Mochilas Wayuu Originales",
@@ -15,7 +17,10 @@ export const metadata: Metadata = {
 export const revalidate = 60;
 
 export default async function CatalogoPage() {
-  const products = await getProducts();
+  const [products, infografia] = await Promise.all([
+    getProducts("mochilas"),
+    getSetting("infografia_mochilas"),
+  ]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12 min-h-[70vh]">
@@ -41,6 +46,9 @@ export default async function CatalogoPage() {
 
       {/* Grid de Productos con filtros integrados */}
       <ProductGrid products={products} />
+
+      {/* Guía de tallas / infografía (se administra en /admin/contenido) */}
+      <InfografiaFooter src={infografia} alt="Guía de tallas de mochilas Wayuu" />
     </div>
   );
 }

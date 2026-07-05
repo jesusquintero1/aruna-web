@@ -6,9 +6,10 @@ import { Plus } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminProductos() {
-  const productos = await getProductsAdmin();
+export default async function AdminProductos({ searchParams }: { searchParams: Promise<{ linea?: string }> }) {
+  const [productos, sp] = await Promise.all([getProductsAdmin(), searchParams]);
   const configured = isSupabaseConfigured();
+  const lineaInicial = sp.linea === "maquillaje" ? "maquillaje" as const : sp.linea === "mochilas" ? "mochilas" as const : undefined;
 
   return (
     <div className="space-y-6">
@@ -26,7 +27,7 @@ export default async function AdminProductos() {
         </p>
       )}
 
-      <ProductosListClient productos={productos} />
+      <ProductosListClient productos={productos} lineaInicial={lineaInicial} />
     </div>
   );
 }
