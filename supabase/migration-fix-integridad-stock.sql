@@ -344,3 +344,26 @@ begin
   update orders set estado = p_estado where id = p_id;
 end;
 $$;
+
+-- ------------------------------------------------------------
+-- Limpieza: elimina una sobrecarga LEGACY de create_order (11 args, sin
+-- p_descuento) que puede haber quedado de migraciones antiguas. El código
+-- actual llama SIEMPRE a la versión de 14 args (definida arriba, ya corregida);
+-- la vieja es código muerto con la lógica de oversell. Se busca por aridad para
+-- no depender de los tipos exactos. Idempotente: si no existe, no hace nada.
+-- ------------------------------------------------------------
+do $$
+declare r regprocedure;
+begin
+  for r in
+    select p.oid::regprocedure
+    from pg_proc p
+    join pg_namespace n on n.oid = p.pronamespace
+    where p.proname = 'create_order'
+      and n.nspname = 'public'
+      and array_length(p.proargtypes, 1) = 11
+  loop
+    execute 'drop function ' || r::text;
+    raise notice 'create_order legacy (11 args) eliminada: %', r::text;
+  end loop;
+end $$;
