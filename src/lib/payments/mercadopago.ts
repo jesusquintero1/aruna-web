@@ -96,13 +96,29 @@ export async function getPayment(paymentId: string): Promise<PaymentInfo | null>
  *   HMAC-SHA256(manifest, MP_WEBHOOK_SECRET) == v1
  * Si no hay secreto configurado, devuelve true (modo permisivo para pruebas).
  */
+let warnedMissingSecret = false;
+
+/** Tolerancia anti-replay para el `ts` de la firma (segundos). Generosa a propósito. */
+const SIGNATURE_MAX_SKEW_SECONDS = 60 * 60; // 1 hora
+
 export function verifyWebhookSignature(opts: {
   xSignature: string | null;
   xRequestId: string | null;
   dataId: string | null;
 }): boolean {
   const secret = process.env.MP_WEBHOOK_SECRET;
-  if (!secret) return true; // sin secreto: no se valida (entorno de prueba)
+  if (!secret) {
+    // Sin secreto no se valida la firma. En producción es un riesgo (mitigado
+    // porque el webhook re-consulta el pago real a MP): avisamos una sola vez.
+    if (process.env.NODE_ENV === "production" && !warnedMissingSecret) {
+      warnedMissingSecret = true;
+      console.warn(
+        "MP_WEBHOOK_SECRET no está configurado: el webhook de Mercado Pago acepta " +
+          "notificaciones SIN validar la firma. Configúralo en el panel de MP + Netlify."
+      );
+    }
+    return true; // modo permisivo (pruebas / secreto aún no configurado)
+  }
 
   const { xSignature, xRequestId, dataId } = opts;
   if (!xSignature || !dataId) return false;
@@ -117,6 +133,15 @@ export function verifyWebhookSignature(opts: {
   const ts = parts["ts"];
   const v1 = parts["v1"];
   if (!ts || !v1) return false;
+
+  // Anti-replay: rechaza timestamps absurdamente viejos o futuros. Normaliza
+  // ms->s y usa una ventana amplia para no rechazar webhooks legítimos.
+  const tsNum = Number(ts);
+  if (Number.isFinite(tsNum)) {
+    const tsSeconds = tsNum > 1e12 ? Math.floor(tsNum / 1000) : tsNum;
+    const nowSeconds = Math.floor(Date.now() / 1000);
+    if (Math.abs(nowSeconds - tsSeconds) > SIGNATURE_MAX_SKEW_SECONDS) return false;
+  }
 
   const manifest = `id:${dataId};request-id:${xRequestId ?? ""};ts:${ts};`;
   const computed = crypto.createHmac("sha256", secret).update(manifest).digest("hex");

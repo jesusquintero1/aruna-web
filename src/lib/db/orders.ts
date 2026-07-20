@@ -124,6 +124,9 @@ function mapOrderError(message: string | undefined): OrderError {
   if (msg.includes("PEDIDO_NO_EXISTE")) {
     return new OrderError("El pedido ya no existe.");
   }
+  if (msg.includes("ESTADO_INVALIDO")) {
+    return new OrderError("Estado de pedido no válido.");
+  }
   return new OrderError("No se pudo procesar el pedido. Intenta de nuevo.");
 }
 
@@ -179,19 +182,30 @@ export async function getOrderById(id: string): Promise<Order | null> {
   return data as Order;
 }
 
-/** Cambia el estado de un pedido (admin). */
+/**
+ * Cambia el estado de un pedido (admin) ajustando el inventario:
+ * pasar a 'cancelado' repone stock, salir de 'cancelado' lo vuelve a
+ * descontar (puede lanzar SIN_STOCK). Usa el RPC transaccional
+ * set_order_status en vez de un update crudo.
+ */
 export async function updateOrderStatus(id: string, estado: Order["estado"]): Promise<void> {
   const db = getSupabase();
   if (!db) return;
-  await db.from("orders").update({ estado }).eq("id", id);
+  const { error } = await db.rpc("set_order_status", { p_id: id, p_estado: estado });
+  if (error) throw mapOrderError(error.message);
 }
 
-/** Marca un pedido como pagado (solo si estaba pendiente). Lo usa el webhook de pago. */
+/**
+ * Marca un pedido como pagado (solo si estaba pendiente). Lo usa el webhook de pago.
+ * Devuelve `true` si transicionó a pagado en esta llamada, `false` si no cambió
+ * (ya estaba pagado, o ya no estaba pendiente). LANZA si hay error de DB: el
+ * webhook lo traduce a 5xx para que Mercado Pago reintente y no se pierda el pago.
+ */
 export async function markOrderPaid(id: string, ref: string | null): Promise<boolean> {
   const db = getSupabase();
   if (!db) return false;
   const { data, error } = await db.rpc("mark_order_paid", { p_id: id, p_ref: ref });
-  if (error) return false;
+  if (error) throw new Error(`mark_order_paid falló: ${error.message}`);
   return data === true;
 }
 

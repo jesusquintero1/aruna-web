@@ -45,9 +45,15 @@ export async function POST(req: NextRequest) {
       const order = await getOrderById(id);
       if (order) {
         const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || req.nextUrl.origin;
-        const pref = await createPreference(order, baseUrl);
-        if (pref?.init_point) {
-          return NextResponse.json({ orderId: id, init_point: pref.init_point });
+        try {
+          const pref = await createPreference(order, baseUrl);
+          if (pref?.init_point) {
+            return NextResponse.json({ orderId: id, init_point: pref.init_point });
+          }
+        } catch (e) {
+          // Si createPreference lanza, NO dejamos que escale a un 500 con el pedido
+          // ya creado (stock reservado sin respuesta útil): caemos al respaldo manual.
+          console.error("createPreference falló:", e);
         }
       }
       // Si falla la creación de la preferencia, devolvemos el pedido igual (respaldo manual).

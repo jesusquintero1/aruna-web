@@ -63,6 +63,9 @@ export const posSaleSchema = z.object({
   descuento: z.coerce.number().int().min(0).max(MAX_MONEY).optional(),
 });
 
+/** Estados válidos de un pedido (para el cambio de estado desde el admin). */
+export const orderStatusSchema = z.enum(["pendiente", "pagado", "enviado", "cancelado"]);
+
 export const orderEditSchema = z.object({
   id: z.string().min(1).max(40),
   estado: z.enum(["pendiente", "pagado", "enviado", "cancelado"]),
