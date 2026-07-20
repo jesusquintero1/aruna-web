@@ -4,7 +4,7 @@ import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
   title: "Política de Privacidad y Tratamiento de Datos",
-  description: "Política de tratamiento de datos personales de ARÜNA conforme a la Ley 1581 de 2012 (Habeas Data).",
+  description: "Política de tratamiento de datos personales de ARÜVIA conforme a la Ley 1581 de 2012 (Habeas Data).",
   robots: { index: true, follow: true },
 };
 
@@ -19,13 +19,13 @@ export default function PrivacidadPage() {
     >
       <p>
         En cumplimiento de la Ley Estatutaria 1581 de 2012 y sus decretos reglamentarios, <strong>{legal.razonSocial}</strong>{" "}
-        (NIT <strong>{legal.nit}</strong>), con domicilio en {legal.domicilio} (en adelante “ARÜNA”), informa su política
+        (NIT <strong>{legal.nit}</strong>), con domicilio en {legal.domicilio} (en adelante “ARÜVIA”), informa su política
         de tratamiento de datos personales de quienes interactúan con la tienda <strong>{siteConfig.name}</strong>.
       </p>
 
       <h2>1. Responsable del tratamiento</h2>
       <p>
-        ARÜNA — {legal.razonSocial}, NIT {legal.nit}, domicilio {legal.domicilio}. Correo de contacto para asuntos de
+        ARÜVIA — {legal.razonSocial}, NIT {legal.nit}, domicilio {legal.domicilio}. Correo de contacto para asuntos de
         datos personales: <a href={`mailto:${contact.email}`}>{contact.email}</a>.
       </p>
 
@@ -33,7 +33,7 @@ export default function PrivacidadPage() {
       <ul>
         <li>Datos de identificación y contacto: nombre, cédula, teléfono, correo electrónico.</li>
         <li>Datos de envío: dirección, ciudad y departamento.</li>
-        <li>Datos de la compra: productos, montos y método de pago (el pago se procesa por la pasarela; ARÜNA no almacena datos de tarjetas).</li>
+        <li>Datos de la compra: productos, montos y método de pago (el pago se procesa por la pasarela; ARÜVIA no almacena datos de tarjetas).</li>
         <li>Correo electrónico de quienes se suscriben al newsletter.</li>
       </ul>
 
@@ -73,7 +73,7 @@ export default function PrivacidadPage() {
       <h2>7. Vigencia</h2>
       <p>
         Esta política rige desde {legal.vigenciaDesde}. Los datos se conservarán mientras sean necesarios para las
-        finalidades descritas o mientras lo exija la ley. ARÜNA podrá actualizar esta política; los cambios se publicarán
+        finalidades descritas o mientras lo exija la ley. ARÜVIA podrá actualizar esta política; los cambios se publicarán
         en esta misma página.
       </p>
     </LegalShell>

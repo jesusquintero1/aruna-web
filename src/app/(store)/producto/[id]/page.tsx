@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const formattedPrice = formatPrice(producto.precio);
   const esMaquillaje = producto.linea === "maquillaje";
   const title = esMaquillaje
-    ? `${producto.nombre} - Maquillaje ARÜNA`
+    ? `${producto.nombre} - Maquillaje ARÜVIA`
     : `Mochila Wayuu ${producto.nombre} - Compra Original`;
   const description = esMaquillaje
     ? `${producto.nombre} (${formattedPrice}). ${producto.descripcion.substring(0, 120)}...`

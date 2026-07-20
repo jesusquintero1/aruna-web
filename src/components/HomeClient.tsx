@@ -21,9 +21,9 @@ interface HomeClientProps {
 
 /** Respaldo si no hay ningún producto destacado publicado. */
 const fallbackSlides = [
-  { img: "/images/mochila_flamenco.png", href: "/catalogo", nombre: "Mochila Wayuu Arüna" },
-  { img: "/images/mochila_cardenal.png", href: "/catalogo", nombre: "Mochila Wayuu Arüna" },
-  { img: "/images/mochila_iguaraya.png", href: "/catalogo", nombre: "Mochila Wayuu Arüna" },
+  { img: "/images/mochila_flamenco.png", href: "/catalogo", nombre: "Mochila Wayuu Arüvia" },
+  { img: "/images/mochila_cardenal.png", href: "/catalogo", nombre: "Mochila Wayuu Arüvia" },
+  { img: "/images/mochila_iguaraya.png", href: "/catalogo", nombre: "Mochila Wayuu Arüvia" },
 ];
 
 export default function HomeClient({ featured, disponibles }: HomeClientProps) {

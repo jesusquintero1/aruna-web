@@ -4,7 +4,7 @@ import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
   title: "Política de Cookies",
-  description: "Cómo ARÜNA usa cookies y tecnologías similares, y cómo gestionar tu consentimiento.",
+  description: "Cómo ARÜVIA usa cookies y tecnologías similares, y cómo gestionar tu consentimiento.",
   robots: { index: true, follow: true },
 };
 

@@ -4,7 +4,7 @@ import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
   title: "Cambios y Devoluciones",
-  description: "Política de cambios, devoluciones, derecho de retracto y garantía legal de ARÜNA (Ley 1480 de 2011).",
+  description: "Política de cambios, devoluciones, derecho de retracto y garantía legal de ARÜVIA (Ley 1480 de 2011).",
   robots: { index: true, follow: true },
 };
 
@@ -22,7 +22,7 @@ export default function DevolucionesPage() {
         En las ventas realizadas a distancia (por internet), el consumidor tiene <strong>derecho de retracto</strong> y
         puede cancelar la compra dentro de los <strong>cinco (5) días hábiles</strong> siguientes a la entrega del
         producto, conforme al artículo 47 de la Ley 1480 de 2011. El producto debe devolverse en las mismas condiciones
-        en que se recibió. ARÜNA reintegrará el dinero pagado a más tardar dentro de los treinta (30) días calendario
+        en que se recibió. ARÜVIA reintegrará el dinero pagado a más tardar dentro de los treinta (30) días calendario
         siguientes. Los costos de transporte de la devolución corren por cuenta del consumidor, salvo disposición legal
         en contrario.
       </p>

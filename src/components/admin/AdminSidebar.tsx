@@ -33,7 +33,7 @@ export default function AdminSidebar({ username }: { username: string }) {
     <>
       {/* Barra superior móvil */}
       <div className="md:hidden flex items-center justify-between bg-carbon text-white px-4 py-3 sticky top-0 z-40">
-        <span className="font-lux font-bold tracking-widest">ARÜNA · Admin</span>
+        <span className="font-lux font-bold tracking-widest">ARÜVIA · Admin</span>
         <button onClick={() => setOpen(!open)} aria-label="Menú">{open ? <X /> : <Menu />}</button>
       </div>
 
@@ -42,7 +42,7 @@ export default function AdminSidebar({ username }: { username: string }) {
           <div className="px-3 py-4 mb-4 border-b border-white/10">
             <div className="flex items-center gap-2">
               <span className="text-gold-lux">✦</span>
-              <span className="font-lux font-bold text-xl tracking-[0.2em] uppercase">ARÜNA</span>
+              <span className="font-lux font-bold text-xl tracking-[0.2em] uppercase">ARÜVIA</span>
             </div>
             <p className="text-[10px] text-white/40 font-bold tracking-[0.3em] uppercase mt-1">Administración</p>
           </div>

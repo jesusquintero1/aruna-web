@@ -84,7 +84,7 @@ export default function ProductDetailsClient({ producto, productosRelacionados }
     name: "Margoth Fontalvo",
     clan: "Pushaina (Tradición y Linaje)",
     experience: "18 Años",
-    bio: "Margoth lidera el taller de tejedoras de ARÜNA en la Alta Guajira. Custodia las técnicas tradicionales de hilado y asegura que el 70% de cada venta retorne íntegramente a las artesanas que confeccionan cada obra."
+    bio: "Margoth lidera el taller de tejedoras de ARÜVIA en la Alta Guajira. Custodia las técnicas tradicionales de hilado y asegura que el 70% de cada venta retorne íntegramente a las artesanas que confeccionan cada obra."
   };
 
   const artisan = artisanProfiles[producto.id] || defaultArtisan;
@@ -248,7 +248,7 @@ export default function ProductDetailsClient({ producto, productosRelacionados }
             <div className="flex items-start space-x-3 text-[11px] font-semibold text-chocolate-light">
               <Sparkles className="w-4.5 h-4.5 text-terracotta flex-shrink-0 mt-0.5" />
               <div>
-                <h4 className="font-bold text-chocolate uppercase tracking-wide text-[10px]">{esMaquillaje ? "Selección Arüna" : "Tejido de Autor"}</h4>
+                <h4 className="font-bold text-chocolate uppercase tracking-wide text-[10px]">{esMaquillaje ? "Selección Arüvia" : "Tejido de Autor"}</h4>
                 <p className="text-[10px]">{esMaquillaje ? "Calidad garantizada" : "Hecho a un solo hilo"}</p>
               </div>
             </div>

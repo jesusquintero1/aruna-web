@@ -27,9 +27,9 @@ export default async function CatalogoPage() {
       {/* Cabecera del Catálogo */}
       <div className="text-center space-y-4 max-w-xl mx-auto relative">
         <span className="text-xs uppercase font-bold tracking-widest text-cardenal block">Galería Ancestral</span>
-        <h1 className="font-lux font-bold text-4xl sm:text-5xl text-carbon">Colección ARÜNA</h1>
+        <h1 className="font-lux font-bold text-4xl sm:text-5xl text-carbon">Colección ARÜVIA</h1>
         <p className="text-sm text-carbon/75 font-medium leading-relaxed">
-          Cada mochila es una obra de arte tejida en un ciclo de 25 días. Al comprar una mochila Arüna, te llevas una pieza irrepetible y apoyas directamente al pueblo artesano de La Guajira.
+          Cada mochila es una obra de arte tejida en un ciclo de 25 días. Al comprar una mochila Arüvia, te llevas una pieza irrepetible y apoyas directamente al pueblo artesano de La Guajira.
         </p>
 
         {/* Separador de la Marca */}

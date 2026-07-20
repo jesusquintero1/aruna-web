@@ -1,6 +1,6 @@
-# 🌺 ARÜNA — Tienda Online de Mochilas Wayuu Premium
+# 🌺 ARÜVIA — Tienda Online de Mochilas Wayuu Premium
 
-Bienvenido a la base de código de **ARÜNA**, la mejor tienda online de artesanías y mochilas Wayuu de La Guajira, Colombia. Este proyecto ha sido construido por **Antigravity** con un enfoque de alto premium, diseño mobile-first, animaciones fluidas y optimización SEO líder en su nicho para maximizar las conversiones de venta directa mediante **WhatsApp** y un **Carrito de Compras** ligero.
+Bienvenido a la base de código de **ARÜVIA**, la mejor tienda online de artesanías y mochilas Wayuu de La Guajira, Colombia. Este proyecto ha sido construido por **Antigravity** con un enfoque de alto premium, diseño mobile-first, animaciones fluidas y optimización SEO líder en su nicho para maximizar las conversiones de venta directa mediante **WhatsApp** y un **Carrito de Compras** ligero.
 
 El sitio está estructurado para que el dueño de la tienda no tenga que tocar código de programación; solo necesita editar un archivo de texto para agregar productos y cambiar la configuración de contacto.
 
@@ -71,7 +71,7 @@ Para agregar un producto nuevo:
 ## 🎨 Arquitectura y Sistema de Diseño Premium
 
 ### 🌿 Identidad Visual e Inspiración (La Guajira)
-La interfaz visual de ARÜNA incorpora íconos vectoriales SVG premium y minimalistas que representan la fauna y flora sagrada de La Guajira:
+La interfaz visual de ARÜVIA incorpora íconos vectoriales SVG premium y minimalistas que representan la fauna y flora sagrada de La Guajira:
 * **Colibrí:** Representa el viento y la vida. Animado con un sutil aleteo en la cabecera.
 * **Flamenco Rosado:** Elegancia costera representativa de la laguna de flamencos.
 * **Cardenal Guajiro:** Ave insignia con su característico copete de rojo intenso.
@@ -101,7 +101,7 @@ Los colores se definen e inyectan automáticamente en el compilador desde [globa
 
 ## 📈 Optimización SEO de Primer Nivel
 
-ARÜNA cuenta con la infraestructura SEO más potente del mercado:
+ARÜVIA cuenta con la infraestructura SEO más potente del mercado:
 1. **Dynamic Metadata:** Metadatos completos (title, description, tags, locales canonicals) generados automáticamente en el servidor para cada producto y página.
 2. **Schema.org Structured Data (JSON-LD):** Inyecta datos en formato Schema.org de tipo `Organization` y `Product` (con disponibilidad, marca y precios) para que Google muestre resultados enriquecidos con estrellas de calificación y precios en las búsquedas.
 3. **Sitemap & Robots Dinámicos:** Genera dinámicamente `/sitemap.xml` y `/robots.txt` mapeando los productos del array para indexación veloz en Search Console.

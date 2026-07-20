@@ -56,7 +56,7 @@ export async function createPreference(order: Order, baseUrl: string): Promise<P
       auto_return: "approved",
       // Mercado Pago rechaza notification_url con localhost: se omite en local.
       ...(isLocal ? {} : { notification_url: `${baseUrl}/api/mercadopago/webhook` }),
-      statement_descriptor: "ARUNA",
+      statement_descriptor: "ARUVIA",
     },
   });
 

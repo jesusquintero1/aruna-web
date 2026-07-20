@@ -15,7 +15,7 @@ function getClient(): Resend | null {
   return new Resend(key);
 }
 
-const FROM = process.env.EMAIL_FROM || "ARÜNA <onboarding@resend.dev>";
+const FROM = process.env.EMAIL_FROM || "ARÜVIA <onboarding@resend.dev>";
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || siteConfig.contact.email;
 
 function itemsTable(order: Order): string {
@@ -52,14 +52,14 @@ function shell(title: string, body: string): string {
   <div style="font-family:Arial,Helvetica,sans-serif;background:#f7f3ec;padding:24px;">
     <div style="max-width:560px;margin:0 auto;background:#fff;border:1px solid #e8e0d4;border-radius:16px;overflow:hidden;">
       <div style="background:#2b2118;padding:20px;text-align:center;">
-        <span style="color:#d4af37;font-size:22px;font-weight:800;letter-spacing:2px;">✦ ARÜNA ✦</span>
+        <span style="color:#d4af37;font-size:22px;font-weight:800;letter-spacing:2px;">✦ ARÜVIA ✦</span>
       </div>
       <div style="padding:28px;">
         <h1 style="font-size:20px;color:#2b2118;margin:0 0 12px;">${title}</h1>
         ${body}
       </div>
       <div style="background:#f7f3ec;padding:16px;text-align:center;color:#8a7d6a;font-size:12px;">
-        ARÜNA · Mochilas Wayuu de La Guajira · ${escapeHtml(siteConfig.url)}
+        ARÜVIA · Mochilas Wayuu de La Guajira · ${escapeHtml(siteConfig.url)}
       </div>
     </div>
   </div>`;
@@ -97,7 +97,7 @@ export async function sendPaidOrderEmails(order: Order, fallbackCustomerEmail?: 
       await resend.emails.send({
         from: FROM,
         to: customerEmail,
-        subject: `Tu pedido ${order.id} está confirmado · ARÜNA`,
+        subject: `Tu pedido ${order.id} está confirmado · ARÜVIA`,
         html: shell("¡Pago confirmado!", body),
       });
     } catch (e) {
