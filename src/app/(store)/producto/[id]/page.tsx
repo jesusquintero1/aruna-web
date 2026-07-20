@@ -28,11 +28,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const formattedPrice = formatPrice(producto.precio);
   const esMaquillaje = producto.linea === "maquillaje";
   const title = esMaquillaje
-    ? `${producto.nombre} - Maquillaje ARÜNA`
+    ? `${producto.nombre} - Maquillaje ARÜVIA`
     : `Mochila Wayuu ${producto.nombre} - Compra Original`;
   const description = esMaquillaje
     ? `${producto.nombre} (${formattedPrice}). ${producto.descripcion.substring(0, 120)}...`
     : `${producto.nombre} tejida a mano en La Guajira por artesanas locales (${formattedPrice}). ${producto.descripcion.substring(0, 120)}...`;
+
+  // Guarda defensiva: mapRow garantiza ≥1 imagen, pero evitamos meter `undefined`
+  // en Open Graph/Twitter si algún producto llegara sin imágenes.
+  const ogImage = producto.imagenes[0];
 
   return {
     title,
@@ -53,20 +57,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
       url: `${siteConfig.url}/producto/${producto.id}`,
       type: "article",
-      images: [
-        {
-          url: producto.imagenes[0],
-          width: 800,
-          height: 1000,
-          alt: producto.nombre,
-        },
-      ],
+      images: ogImage
+        ? [
+            {
+              url: ogImage,
+              width: 800,
+              height: 1000,
+              alt: producto.nombre,
+            },
+          ]
+        : [],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [producto.imagenes[0]],
+      images: ogImage ? [ogImage] : [],
     },
   };
 }

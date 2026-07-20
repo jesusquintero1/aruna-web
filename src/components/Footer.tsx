@@ -30,7 +30,7 @@ export default function Footer() {
         {/* Newsletter */}
         <div className="bg-white/5 border border-white/10 rounded-3xl p-6 sm:p-8 mb-14 grid lg:grid-cols-2 gap-6 items-center">
           <div>
-            <h3 className="font-title font-bold text-2xl text-arena">Únete a la comunidad ARÜNA</h3>
+            <h3 className="font-title font-bold text-2xl text-arena">Únete a la comunidad ARÜVIA</h3>
             <p className="text-sm text-arena/70 mt-1.5 max-w-md">
               Recibe lanzamientos, historias y leyendas de La Guajira. Sin spam, solo lo bueno.
             </p>
@@ -52,7 +52,7 @@ export default function Footer() {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-arena/70 hover:text-flamenco-claro bg-white/5 hover:bg-white/10 px-4 py-2 rounded-full transition-all text-sm font-bold"
             >
-              <InstagramIcon className="w-4 h-4" /> @arunawayuu
+              <InstagramIcon className="w-4 h-4" /> @aruvia
             </a>
           </div>
 
@@ -90,7 +90,7 @@ export default function Footer() {
 
           {/* Confianza */}
           <div className="space-y-4">
-            <h4 className="font-title font-bold text-lg text-arena">Confianza Arüna</h4>
+            <h4 className="font-title font-bold text-lg text-arena">Confianza Arüvia</h4>
             <div className="space-y-3">
               {trust.map((t, i) => (
                 <div key={i} className="flex items-center gap-2.5 text-xs text-arena/80 bg-white/5 p-2.5 rounded-xl">
@@ -123,7 +123,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-white/10 mt-6 pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-arena/50 gap-4">
-          <p>© {new Date().getFullYear()} ARÜNA. Hecho con orgullo en Colombia.</p>
+          <p>© {new Date().getFullYear()} ARÜVIA. Hecho con orgullo en Colombia.</p>
           <div className="flex items-center gap-1.5">
             <span>Tejido con</span>
             <Heart className="w-3.5 h-3.5 text-flamenco fill-current" />

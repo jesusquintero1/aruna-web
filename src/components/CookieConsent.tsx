@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useSyncExternalStore } from "react";
 import Link from "next/link";
-import { getConsent, setConsent } from "@/lib/analytics/config";
+import { getConsent, setConsent, subscribeConsent, getConsentServerSnapshot } from "@/lib/analytics/config";
 import { Cookie } from "lucide-react";
 
 /**
@@ -11,19 +11,13 @@ import { Cookie } from "lucide-react";
  * AnalyticsScripts reacciona al evento para montar/no montar los scripts.
  */
 export default function CookieConsent() {
-  const [visible, setVisible] = useState(false);
+  const consent = useSyncExternalStore(subscribeConsent, getConsent, getConsentServerSnapshot);
 
-  useEffect(() => {
-    // Mostrar solo si aún no hay decisión guardada.
-    if (getConsent() === null) setVisible(true);
-  }, []);
+  // Mostrar solo mientras no haya decisión guardada. Al elegir, setConsent
+  // dispara el evento y el store re-renderiza ocultando el aviso.
+  if (consent !== null) return null;
 
-  if (!visible) return null;
-
-  const choose = (v: "granted" | "denied") => {
-    setConsent(v);
-    setVisible(false);
-  };
+  const choose = (v: "granted" | "denied") => setConsent(v);
 
   return (
     <div className="fixed bottom-4 inset-x-4 sm:left-auto sm:right-4 sm:max-w-sm z-[60]">

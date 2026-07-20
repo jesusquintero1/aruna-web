@@ -1,27 +1,20 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useSyncExternalStore } from "react";
 import Script from "next/script";
 import {
   GA_ID, FB_PIXEL_ID, isAnalyticsConfigured,
-  getConsent, CONSENT_EVENT, type Consent,
+  getConsent, subscribeConsent, getConsentServerSnapshot,
 } from "@/lib/analytics/config";
 
 /**
  * Carga GA4 y/o el Píxel de Meta SOLO si:
  *   1) hay IDs configurados (NEXT_PUBLIC_GA_ID / NEXT_PUBLIC_FB_PIXEL_ID), y
  *   2) el usuario aceptó las cookies (consentimiento === 'granted').
- * Reacciona al evento de consentimiento para montar sin recargar la página.
+ * Se suscribe al store de consentimiento para montar sin recargar la página.
  */
 export default function AnalyticsScripts() {
-  const [consent, setConsentState] = useState<Consent | null>(null);
-
-  useEffect(() => {
-    setConsentState(getConsent());
-    const onChange = (e: Event) => setConsentState((e as CustomEvent).detail as Consent);
-    window.addEventListener(CONSENT_EVENT, onChange);
-    return () => window.removeEventListener(CONSENT_EVENT, onChange);
-  }, []);
+  const consent = useSyncExternalStore(subscribeConsent, getConsent, getConsentServerSnapshot);
 
   if (!isAnalyticsConfigured() || consent !== "granted") return null;
 

@@ -1,5 +1,5 @@
 /**
- * CONFIGURACIÓN GLOBAL DE ARÜNA
+ * CONFIGURACIÓN GLOBAL DE ARÜVIA
  * 
  * Centraliza toda la información de la tienda.
  * El dueño puede modificar este archivo para cambiar números, enlaces de redes sociales,
@@ -7,7 +7,7 @@
  */
 
 export const siteConfig = {
-  name: "ARÜNA",
+  name: "ARÜVIA",
   tagline: "Mochilas Wayuu Auténticas · Tejidas con el Alma de La Guajira",
   description: "Boutique premium de mochilas Wayuu 100% tejidas a mano en La Guajira, Colombia. Comercio justo, piezas únicas con alma y tradición ancestral.",
   url: "https://aruna-wayuu.netlify.app", // Dominio de producción (Netlify)
@@ -17,17 +17,17 @@ export const siteConfig = {
     // IMPORTANTE: Cambiar este número por el número de WhatsApp real con código de país.
     // Ejemplo: "+573123456789" para Colombia. Sin espacios, sin guiones.
     whatsapp: "+573123456789", 
-    email: "hola@arunawayuu.com",
+    email: "hola@aruvia.com",
     address: "Maicao, La Guajira, Colombia",
-    instagram: "https://instagram.com/aruna.guajira", // Cuenta de instagram real o placeholder
-    facebook: "https://facebook.com/aruna.guajira",
+    instagram: "https://instagram.com/aruvia.guajira", // Cuenta de instagram real o placeholder
+    facebook: "https://facebook.com/aruvia.guajira",
   },
 
   // IDENTIDAD LEGAL (para páginas legales y facturación).
   // IMPORTANTE: reemplazar los placeholders por los datos reales del negocio
   // antes de salir a producción, y revisar los textos legales con un abogado.
   legal: {
-    razonSocial: "[RAZÓN SOCIAL]",       // p. ej. "ARÜNA S.A.S." o nombre del comerciante
+    razonSocial: "[RAZÓN SOCIAL]",       // p. ej. "ARÜVIA S.A.S." o nombre del comerciante
     nit: "[NIT / CÉDULA]",
     domicilio: "Maicao, La Guajira, Colombia",
     ciudad: "Maicao, La Guajira",
@@ -44,14 +44,14 @@ export const siteConfig = {
   // TEXTOS DE HISTORIA Y CULTURA
   culture: {
     title: "El Alma de La Guajira en Cada Tejido",
-    text: "En el extremo norte de Colombia, donde el desierto abraza al Mar Caribe, nace el arte del tejido Wayuu. Para nuestra comunidad, tejer no es solo un oficio; es una forma de narrar el universo, un lenguaje plasmado en figuras geométricas llamadas Kanas. Cada mochila ARÜNA es una pieza única tejida a mano por artesanas locales en un proceso que lleva entre 20 y 30 días, preservando técnicas centenarias y garantizando un comercio justo que empodera a sus creadoras.",
+    text: "En el extremo norte de Colombia, donde el desierto abraza al Mar Caribe, nace el arte del tejido Wayuu. Para nuestra comunidad, tejer no es solo un oficio; es una forma de narrar el universo, un lenguaje plasmado en figuras geométricas llamadas Kanas. Cada mochila ARÜVIA es una pieza única tejida a mano por artesanas locales en un proceso que lleva entre 20 y 30 días, preservando técnicas centenarias y garantizando un comercio justo que empodera a sus creadoras.",
   },
 
   // PREGUNTAS FRECUENTES (FAQ)
   faqs: [
     {
       question: "¿Las mochilas son realmente tejidas a mano?",
-      answer: "Sí, absolutamente. Cada mochila de ARÜNA es 100% tejida a mano por maestras artesanas Wayuu de rancherías en La Guajira, utilizando técnicas ancestrales transmitidas de generación en generación. No hay dos mochilas idénticas."
+      answer: "Sí, absolutamente. Cada mochila de ARÜVIA es 100% tejida a mano por maestras artesanas Wayuu de rancherías en La Guajira, utilizando técnicas ancestrales transmitidas de generación en generación. No hay dos mochilas idénticas."
     },
     {
       question: "¿Cómo funciona el envío y cuánto tarda?",

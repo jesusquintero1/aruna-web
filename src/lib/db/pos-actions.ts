@@ -4,8 +4,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { verifySession } from "@/lib/auth/session";
 import { createOrder, OrderError, type OrderItemInput } from "@/lib/db/orders";
-import { updateOrderStatus, updateOrderFull, deleteOrder, type Order } from "@/lib/db/orders";
-import { posSaleSchema, orderEditSchema } from "@/lib/validation/schemas";
+import { updateOrderStatus, updateOrderFull, deleteOrder } from "@/lib/db/orders";
+import { posSaleSchema, orderEditSchema, orderStatusSchema } from "@/lib/validation/schemas";
 
 export interface PosSaleInput {
   items: OrderItemInput[];
@@ -63,12 +63,20 @@ export async function createPosSale(input: PosSaleInput): Promise<PosSaleResult>
   }
 }
 
-/** Cambia el estado de un pedido desde el admin. */
+/** Cambia el estado de un pedido desde el admin (validado y consciente del stock). */
 export async function changeOrderStatus(formData: FormData): Promise<void> {
   await verifySession();
   const id = String(formData.get("id") || "");
-  const estado = String(formData.get("estado") || "") as Order["estado"];
-  await updateOrderStatus(id, estado);
+  const parsedEstado = orderStatusSchema.safeParse(String(formData.get("estado") || ""));
+  if (!id || !parsedEstado.success) return; // estado inválido: no persistimos nada
+
+  try {
+    await updateOrderStatus(id, parsedEstado.data);
+  } catch (e) {
+    // p. ej. reactivar un pedido cancelado sin stock (SIN_STOCK): no rompemos la
+    // acción del formulario; se deja registro y el estado no cambia.
+    console.error("changeOrderStatus:", e instanceof Error ? e.message : e);
+  }
   revalidatePath("/admin/pedidos");
   revalidatePath(`/admin/pedidos/${id}`);
 }

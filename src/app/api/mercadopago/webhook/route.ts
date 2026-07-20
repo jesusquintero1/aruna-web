@@ -46,17 +46,38 @@ export async function POST(req: NextRequest) {
     }
 
     const payment = await getPayment(dataId);
-    if (!payment?.external_reference) {
+    if (!payment) {
+      // No pudimos consultar el pago (probable fallo transitorio de la API de MP).
+      // Respondemos 5xx para que Mercado Pago REINTENTE en vez de perder la
+      // confirmación (antes se respondía 200 y el pago se perdía para siempre).
+      console.error("Webhook MP: getPayment devolvió null para data.id", dataId);
+      return NextResponse.json({ error: "no se pudo consultar el pago" }, { status: 502 });
+    }
+    if (!payment.external_reference) {
+      // Pago sin pedido asociado: nada que conciliar.
       return NextResponse.json({ received: true });
     }
 
     const orderId = payment.external_reference;
     if (payment.status === "approved") {
+      // markOrderPaid LANZA si hay error de DB -> cae al catch -> 500 -> MP reintenta.
       const cambioApagado = await markOrderPaid(orderId, payment.id);
-      // Enviar correos solo en la PRIMERA transición a pagado (evita duplicados en reintentos).
       if (cambioApagado) {
+        // Enviar correos solo en la PRIMERA transición a pagado (evita duplicados en reintentos).
         const order = await getOrderById(orderId);
         if (order) await sendPaidOrderEmails(order, payment.payer_email);
+      } else {
+        // No transicionó: o ya estaba pagado (idempotente, correcto), o el pedido
+        // ya no estaba 'pendiente'. Si está CANCELADO es una incongruencia grave
+        // (el cliente pagó pero el cron ya canceló el pedido y liberó el stock):
+        // lo dejamos muy visible en los logs para regularizarlo a mano.
+        const order = await getOrderById(orderId);
+        if (order && order.estado === "cancelado") {
+          console.error(
+            `⚠️ RECONCILIAR: pago ${payment.id} APROBADO para el pedido ${orderId} que está ` +
+              `CANCELADO (stock liberado). El cliente fue cobrado; revisar y regularizar manualmente.`
+          );
+        }
       }
     } else if (payment.status === "rejected" || payment.status === "cancelled") {
       await releaseOrder(orderId);
@@ -68,8 +89,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ received: true });
   } catch (e) {
     console.error("Error webhook Mercado Pago:", e);
-    // Respondemos 200 para que MP no reintente en bucle por un error nuestro transitorio.
-    return NextResponse.json({ received: true });
+    // Error posiblemente transitorio (DB/red): respondemos 5xx para que Mercado Pago
+    // reintente y NO se pierda la confirmación del pago.
+    return NextResponse.json({ error: "error interno" }, { status: 500 });
   }
 }
 

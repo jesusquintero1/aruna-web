@@ -67,7 +67,7 @@ export default async function AdminDashboard() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="font-lux font-bold text-3xl text-chocolate">Dashboard</h1>
-          <p className="text-sm text-chocolate-light">Resumen financiero de tu tienda Arüna</p>
+          <p className="text-sm text-chocolate-light">Resumen financiero de tu tienda Arüvia</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Link href="/admin/compras/nuevo" className="btn-primary px-5 py-2.5 text-xs uppercase tracking-wider"><Plus className="w-4 h-4" /> Nuevo pedido</Link>

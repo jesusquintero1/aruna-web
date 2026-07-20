@@ -1,4 +1,4 @@
-# Arüna · Puesta en marcha (Admin + POS + Tienda)
+# Arüvia · Puesta en marcha (Admin + POS + Tienda)
 
 La web ya funciona en **modo demo** sin configuración (usa datos de ejemplo, los cambios no se
 guardan, login con `admin` / `admin`). Para activar la persistencia real sigue estos pasos.

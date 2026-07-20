@@ -26,7 +26,11 @@ export default function CountUp({ to, duration = 1800, prefix = "", suffix = "",
 
     const reduce = typeof window !== "undefined"
       && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) { setValue(to); return; }
+    if (reduce) {
+      // Salta al valor final en el próximo frame (evita setState síncrono en el effect).
+      const id = requestAnimationFrame(() => setValue(to));
+      return () => cancelAnimationFrame(id);
+    }
 
     let raf = 0;
     let start: number | null = null;

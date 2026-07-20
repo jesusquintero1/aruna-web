@@ -26,7 +26,9 @@ export default function ProductDetailsClient({ producto, productosRelacionados }
     ...producto.imagenes.map((src): Media => ({ tipo: "imagen", src })),
     ...(producto.videos ?? []).map((src): Media => ({ tipo: "video", src })),
   ];
-  const [activeMedia, setActiveMedia] = useState<Media>(medias[0]);
+  // `medias` casi nunca está vacío (mapRow garantiza ≥1 imagen), pero guardamos
+  // el caso para no reventar la galería si ese fallback cambiara.
+  const [activeMedia, setActiveMedia] = useState<Media | undefined>(medias[0]);
   const { addToCart } = useCart();
 
   // Las secciones de tejido (capacidad, artesana, tintes) solo aplican a mochilas.
@@ -82,7 +84,7 @@ export default function ProductDetailsClient({ producto, productosRelacionados }
     name: "Margoth Fontalvo",
     clan: "Pushaina (Tradición y Linaje)",
     experience: "18 Años",
-    bio: "Margoth lidera el taller de tejedoras de ARÜNA en la Alta Guajira. Custodia las técnicas tradicionales de hilado y asegura que el 70% de cada venta retorne íntegramente a las artesanas que confeccionan cada obra."
+    bio: "Margoth lidera el taller de tejedoras de ARÜVIA en la Alta Guajira. Custodia las técnicas tradicionales de hilado y asegura que el 70% de cada venta retorne íntegramente a las artesanas que confeccionan cada obra."
   };
 
   const artisan = artisanProfiles[producto.id] || defaultArtisan;
@@ -106,7 +108,7 @@ export default function ProductDetailsClient({ producto, productosRelacionados }
         {/* COLUMNA IZQUIERDA: Galería de Imágenes (Boutique Framed) */}
         <div className="lg:col-span-7 space-y-4">
           <div className="relative aspect-[4/5] bg-surface border border-cream-dark/35 rounded-[24px] overflow-hidden shadow-sm">
-            {activeMedia.tipo === "video" ? (
+            {activeMedia?.tipo === "video" ? (
               <video
                 key={activeMedia.src}
                 src={activeMedia.src}
@@ -114,7 +116,7 @@ export default function ProductDetailsClient({ producto, productosRelacionados }
                 playsInline
                 className="absolute inset-0 w-full h-full object-contain bg-carbon"
               />
-            ) : (
+            ) : activeMedia ? (
               <Image
                 src={activeMedia.src}
                 alt={producto.nombre}
@@ -123,7 +125,7 @@ export default function ProductDetailsClient({ producto, productosRelacionados }
                 sizes="(max-width: 1024px) 100vw, 60vw"
                 priority
               />
-            )}
+            ) : null}
             {/* Badges */}
             <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
               {producto.disponible ? (
@@ -146,7 +148,7 @@ export default function ProductDetailsClient({ producto, productosRelacionados }
                   key={idx}
                   onClick={() => setActiveMedia(m)}
                   className={`relative w-20 h-20 bg-surface rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 ${
-                    activeMedia.src === m.src ? "border-terracotta shadow" : "border-cream-dark/30 hover:border-cream-dark"
+                    activeMedia?.src === m.src ? "border-terracotta shadow" : "border-cream-dark/30 hover:border-cream-dark"
                   }`}
                 >
                   {m.tipo === "video" ? (
@@ -246,7 +248,7 @@ export default function ProductDetailsClient({ producto, productosRelacionados }
             <div className="flex items-start space-x-3 text-[11px] font-semibold text-chocolate-light">
               <Sparkles className="w-4.5 h-4.5 text-terracotta flex-shrink-0 mt-0.5" />
               <div>
-                <h4 className="font-bold text-chocolate uppercase tracking-wide text-[10px]">{esMaquillaje ? "Selección Arüna" : "Tejido de Autor"}</h4>
+                <h4 className="font-bold text-chocolate uppercase tracking-wide text-[10px]">{esMaquillaje ? "Selección Arüvia" : "Tejido de Autor"}</h4>
                 <p className="text-[10px]">{esMaquillaje ? "Calidad garantizada" : "Hecho a un solo hilo"}</p>
               </div>
             </div>

@@ -27,3 +27,23 @@ export function setConsent(value: Consent): void {
   window.localStorage.setItem(CONSENT_KEY, value);
   window.dispatchEvent(new CustomEvent(CONSENT_EVENT, { detail: value }));
 }
+
+/**
+ * Suscripción al consentimiento para `useSyncExternalStore` (React 19).
+ * Reacciona tanto al cambio en la misma pestaña (CONSENT_EVENT) como en otras
+ * pestañas (evento nativo `storage`).
+ */
+export function subscribeConsent(callback: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener(CONSENT_EVENT, callback);
+  window.addEventListener("storage", callback);
+  return () => {
+    window.removeEventListener(CONSENT_EVENT, callback);
+    window.removeEventListener("storage", callback);
+  };
+}
+
+/** Snapshot en el servidor: sin decisión (no hay localStorage en SSR). */
+export function getConsentServerSnapshot(): Consent | null {
+  return null;
+}

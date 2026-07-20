@@ -1,5 +1,5 @@
 /**
- * SISTEMA DE PRODUCTOS "ARÜNA" - LISTO PARA EDITAR
+ * SISTEMA DE PRODUCTOS "ARÜVIA" - LISTO PARA EDITAR
  *
  * IMPORTANTE: La tienda lee los productos desde la base de datos (Supabase).
  * Este archivo es la fuente para el seed (`npm run seed:products`) y el fallback
