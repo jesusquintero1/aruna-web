@@ -3,6 +3,7 @@
 import React, { useActionState } from "react";
 import { loginAction, type LoginState } from "@/lib/auth/actions";
 import { Lock, User, Loader2 } from "lucide-react";
+import InstallAppButton from "@/components/InstallAppButton";
 
 export default function AdminLoginPage() {
   const [state, formAction, pending] = useActionState<LoginState, FormData>(loginAction, {});
@@ -59,6 +60,8 @@ export default function AdminLoginPage() {
             {pending ? "Ingresando…" : "Ingresar"}
           </button>
         </form>
+
+        <InstallAppButton />
 
         <p className="text-center text-white/40 text-xs mt-6">Acceso restringido · Arüvia Wayuu</p>
       </div>
