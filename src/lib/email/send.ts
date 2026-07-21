@@ -16,7 +16,10 @@ function getClient(): Resend | null {
 }
 
 const FROM = process.env.EMAIL_FROM || "ARÜVIA <onboarding@resend.dev>";
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || siteConfig.contact.email;
+// Correo del negocio al que llega la alerta de venta. Con Resend SIN dominio
+// verificado solo se puede enviar a la dirección DUEÑA de la cuenta Resend, así
+// que la cuenta Resend debe crearse con este mismo correo.
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "aruviastore@gmail.com";
 
 function itemsTable(order: Order): string {
   const rows = (order.order_items ?? [])

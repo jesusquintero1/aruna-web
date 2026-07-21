@@ -4,7 +4,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { verifySession } from "@/lib/auth/session";
 import { createOrder, OrderError, type OrderItemInput } from "@/lib/db/orders";
-import { updateOrderStatus, updateOrderFull, deleteOrder } from "@/lib/db/orders";
+import { updateOrderStatus, updateOrderFull, deleteOrder, getOrderById } from "@/lib/db/orders";
+import { notifyOrderConfirmed } from "@/lib/notify/order";
 import { posSaleSchema, orderEditSchema, orderStatusSchema } from "@/lib/validation/schemas";
 
 export interface PosSaleInput {
@@ -51,6 +52,9 @@ export async function createPosSale(input: PosSaleInput): Promise<PosSaleResult>
       descuento: input.descuento,
       items: input.items,
     });
+    // Notificar (correo + push) la venta POS recién creada. Best-effort.
+    const order = await getOrderById(id);
+    if (order) await notifyOrderConfirmed(order);
     revalidatePath("/");
     revalidatePath("/catalogo");
     revalidatePath("/admin");

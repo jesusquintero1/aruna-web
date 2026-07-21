@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPayment, verifyWebhookSignature } from "@/lib/payments/mercadopago";
 import { markOrderPaid, releaseOrder, getOrderById } from "@/lib/db/orders";
-import { sendPaidOrderEmails } from "@/lib/email/send";
+import { notifyOrderConfirmed } from "@/lib/notify/order";
 import { revalidatePath } from "next/cache";
 
 /**
@@ -63,9 +63,10 @@ export async function POST(req: NextRequest) {
       // markOrderPaid LANZA si hay error de DB -> cae al catch -> 500 -> MP reintenta.
       const cambioApagado = await markOrderPaid(orderId, payment.id);
       if (cambioApagado) {
-        // Enviar correos solo en la PRIMERA transición a pagado (evita duplicados en reintentos).
+        // Notificar (correo + push) solo en la PRIMERA transición a pagado
+        // (evita duplicados si Mercado Pago reintenta el webhook).
         const order = await getOrderById(orderId);
-        if (order) await sendPaidOrderEmails(order, payment.payer_email);
+        if (order) await notifyOrderConfirmed(order, payment.payer_email);
       } else {
         // No transicionó: o ya estaba pagado (idempotente, correcto), o el pedido
         // ya no estaba 'pendiente'. Si está CANCELADO es una incongruencia grave
