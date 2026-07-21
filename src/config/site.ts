@@ -10,14 +10,14 @@ export const siteConfig = {
   name: "ARÜVIA",
   tagline: "Mochilas Wayuu Auténticas · Tejidas con el Alma de La Guajira",
   description: "Boutique premium de mochilas Wayuu 100% tejidas a mano en La Guajira, Colombia. Comercio justo, piezas únicas con alma y tradición ancestral.",
-  url: "https://aruna-wayuu.netlify.app", // Dominio de producción (Netlify)
+  url: "https://aruvia.com.co", // Dominio de producción (Cloudflare DNS → Netlify)
   
   // CONFIGURACIÓN DE CONTACTO Y VENTAS
   contact: {
     // IMPORTANTE: Cambiar este número por el número de WhatsApp real con código de país.
     // Ejemplo: "+573123456789" para Colombia. Sin espacios, sin guiones.
     whatsapp: "+573123456789", 
-    email: "hola@aruvia.com",
+    email: "hola@aruvia.com.co",
     address: "Maicao, La Guajira, Colombia",
     instagram: "https://instagram.com/aruvia.guajira", // Cuenta de instagram real o placeholder
     facebook: "https://facebook.com/aruvia.guajira",
