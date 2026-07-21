@@ -5,6 +5,7 @@ import { getFinanceSummary, getFinanceMovements, getVentasPagadasPorLinea } from
 import { isSupabaseConfigured } from "@/lib/supabase/server";
 import { formatPrice } from "@/lib/utils";
 import FinancePanel from "@/components/admin/FinancePanel";
+import PushToggle from "@/components/admin/PushToggle";
 import type { LineaProducto } from "@/data/productos";
 import { Package, ShoppingBag, TrendingUp, AlertTriangle, Plus, Calculator, Wallet, Boxes, Coins, ShoppingBasket, Sparkles } from "lucide-react";
 
@@ -69,7 +70,8 @@ export default async function AdminDashboard() {
           <h1 className="font-lux font-bold text-3xl text-chocolate">Dashboard</h1>
           <p className="text-sm text-chocolate-light">Resumen financiero de tu tienda Arüvia</p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 items-center">
+          <PushToggle />
           <Link href="/admin/compras/nuevo" className="btn-primary px-5 py-2.5 text-xs uppercase tracking-wider"><Plus className="w-4 h-4" /> Nuevo pedido</Link>
           <Link href="/admin/productos/nuevo" className="btn-secondary px-5 py-2.5 text-xs uppercase tracking-wider"><Plus className="w-4 h-4" /> Producto</Link>
           <Link href="/admin/pos" className="btn-secondary px-5 py-2.5 text-xs uppercase tracking-wider"><Calculator className="w-4 h-4" /> POS</Link>

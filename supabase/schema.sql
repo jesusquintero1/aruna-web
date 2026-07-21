@@ -744,3 +744,15 @@ alter table purchase_orders   enable row level security;
 alter table purchase_items    enable row level security;
 alter table finance_movements enable row level security;
 alter table site_settings     enable row level security;
+
+-- ============================================================
+-- WEB PUSH: suscripciones de notificaciones de pedidos
+--   (ver supabase/migration-push-subscriptions.sql para la DB en vivo)
+-- ============================================================
+create table if not exists push_subscriptions (
+  endpoint text primary key,
+  p256dh text not null,
+  auth text not null,
+  created_at timestamptz not null default now()
+);
+alter table push_subscriptions enable row level security;
