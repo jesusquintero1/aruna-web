@@ -20,12 +20,14 @@ export default function TerminosPage() {
       <h2>1. Identificación del comerciante</h2>
       <p>
         Este sitio es operado por <strong>{legal.razonSocial}</strong> (NIT <strong>{legal.nit}</strong>), con domicilio
-        en {legal.domicilio}. Contacto: <a href={`mailto:${contact.email}`}>{contact.email}</a>.
+        en {legal.domicilio}. <strong>{siteConfig.name}</strong> es la marca comercial bajo la cual{" "}
+        {legal.razonSocial} ofrece sus productos. Contacto: <a href={`mailto:${contact.email}`}>{contact.email}</a>.
       </p>
 
       <h2>2. Objeto</h2>
       <p>
-        ARÜVIA comercializa mochilas y artesanías Wayuu tejidas a mano. Al usar este sitio y realizar una compra, usted
+        ARÜVIA comercializa mochilas y artesanías Wayuu tejidas a mano y productos de maquillaje. Al usar este sitio y
+        realizar una compra, usted
         acepta estos términos y la <a href="/privacidad">Política de Privacidad</a>.
       </p>
 
