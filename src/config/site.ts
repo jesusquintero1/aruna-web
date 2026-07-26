@@ -14,9 +14,8 @@ export const siteConfig = {
   
   // CONFIGURACIÓN DE CONTACTO Y VENTAS
   contact: {
-    // IMPORTANTE: Cambiar este número por el número de WhatsApp real con código de país.
-    // Ejemplo: "+573123456789" para Colombia. Sin espacios, sin guiones.
-    whatsapp: "+573123456789", 
+    // Número de WhatsApp de ventas, con código de país, sin espacios ni guiones.
+    whatsapp: "+573123911367",
     email: "hola@aruvia.com.co",
     address: "Maicao, La Guajira, Colombia",
     instagram: "https://instagram.com/aruvia.guajira", // Cuenta de instagram real o placeholder
