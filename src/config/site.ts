@@ -23,11 +23,11 @@ export const siteConfig = {
   },
 
   // IDENTIDAD LEGAL (para páginas legales y facturación).
-  // IMPORTANTE: reemplazar los placeholders por los datos reales del negocio
-  // antes de salir a producción, y revisar los textos legales con un abogado.
+  // ARÜVIA es la marca comercial; la sociedad que opera la tienda es GRUPO AJQ S.A.S.
+  // Los textos legales siguen pendientes de revisión por un abogado.
   legal: {
-    razonSocial: "[RAZÓN SOCIAL]",       // p. ej. "ARÜVIA S.A.S." o nombre del comerciante
-    nit: "[NIT / CÉDULA]",
+    razonSocial: "GRUPO AJQ S.A.S.",     // sociedad operadora; ARÜVIA es solo la marca
+    nit: "902.014.955-1",
     domicilio: "Maicao, La Guajira, Colombia",
     ciudad: "Maicao, La Guajira",
     vigenciaDesde: "2026",
